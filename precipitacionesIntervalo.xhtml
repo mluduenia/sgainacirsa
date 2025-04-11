@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:pe="http://primefaces.org/ui/extensions">
+<h:body onload="ext1();">
+
+
+	<ui:composition template="template/template.xhtml">
+
+
+		<ui:define name="content">
+
+			<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+				<f:facet name="start">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+					<h:outputText value="Actualizando..." />
+				</f:facet>
+
+				<f:facet name="complete">
+					<h:outputText value="" />
+				</f:facet>
+			</p:ajaxStatus>
+
+
+			<h:form id="formPrecipitaciones">
+
+
+				<p:messages id="messages" showDetail="true" escape="false" />
+
+				<p:fieldset legend="#{messages.consulta_sumarizacion_estacion_intervalo}">
+
+					<p:panelGrid id="panelFiltroSumatoriaIntervalo" columns="7" style="width:100%">
+
+						<h:outputLabel for="somHorasConsulta" value="#{messages.periodo}:">
+							<p:selectOneMenu id="somHorasConsulta" value="#{precipitacionesIntervaloMB.filterdwSumPorSensorIntervalo.horasConsulta}" style="width: 100px">
+								<f:selectItem itemLabel="CALENDARIO" itemValue="" />
+								<f:selectItem itemLabel="ÚLTIMA HORA" itemValue="1" />
+								<f:selectItem itemLabel="ÚLTIMAS 3 HORAS" itemValue="3" />
+								<f:selectItem itemLabel="ÚLTIMAS 6 HORAS" itemValue="6" />
+								<f:selectItem itemLabel="ÚLTIMAS 12 HORAS" itemValue="12" />
+								<f:selectItem itemLabel="ÚLTIMAS 24 HORAS" itemValue="24" />
+								<f:selectItem itemLabel="ÚLTIMOS 7 DÍAS" itemValue="168" />
+								<f:selectItem itemLabel="ÚLTIMOS 30 DÍAS" itemValue="720" />
+								<f:selectItem itemLabel="ÚLTIMOS 60 DÍAS" itemValue="1440" />
+								<f:selectItem itemLabel="ÚLTIMOS 90 DÍAS" itemValue="2160" />
+								<p:ajax listener="#{precipitacionesIntervaloMB.reloadFechas}" update="fechaDesdeSumIntervalo,fechaHastaSumIntervalo,siIntervalos" />
+							</p:selectOneMenu>
+						</h:outputLabel>
+
+						<h:outputLabel for="fechaDesdeSumIntervalo" value="#{messages.fecha_desde} (00:00):">
+							<p:calendar locale="#{loginMBean.locale}"  id="fechaDesdeSumIntervalo" value="#{precipitacionesIntervaloMB.filterdwSumPorSensorIntervalo.tTimeDesde}" navigator="true" display="inline"
+								pattern="dd/MM/yyyy" yearRange="1989:"  showButtonPanel="true" disabled="#{precipitacionesIntervaloMB.filterdwSumPorSensorIntervalo.horasConsulta!=null}" />
+						</h:outputLabel>
+
+						<h:outputLabel for="fechaHastaSumIntervalo" value="#{messages.fecha_hasta} (23:59):">
+							<p:calendar locale="#{loginMBean.locale}" id="fechaHastaSumIntervalo" value="#{precipitacionesIntervaloMB.filterdwSumPorSensorIntervalo.tTimeHasta}" navigator="true" display="inline"
+								pattern="dd/MM/yyyy" yearRange="1989:"  showButtonPanel="true" disabled="#{precipitacionesIntervaloMB.filterdwSumPorSensorIntervalo.horasConsulta!=null}" />
+						</h:outputLabel>
+
+						<h:outputLabel for="siIntervalos" value="#{messages.intervalo}:">
+							<p:selectOneMenu value="#{precipitacionesIntervaloMB.filterdwSumPorSensorIntervalo.intervaloMinutos}" style="width:50px" id="siIntervalos">
+								<f:selectItems value="#{precipitacionesIntervaloMB.siIntervalos}" />
+							</p:selectOneMenu>
+						</h:outputLabel>
+
+						<h:outputLabel value="#{messages.estacion}:" for="selEstacionesIntervalo">
+							<p:selectCheckboxMenu id="selEstacionesIntervalo" label="Seleccione" multiple="true" value="#{precipitacionesIntervaloMB.selectedEstaciones}" filter="true" filterMatchMode="contains"
+								style="width:150px">
+								<f:selectItems value="#{precipitacionesIntervaloMB.siEstaciones}" />
+							</p:selectCheckboxMenu>
+						</h:outputLabel>
+
+						<h:outputLabel value="#{messages.acumulado}:" for="somAcumulado">
+							<p:selectOneMenu id="somAcumulado" value="#{precipitacionesIntervaloMB.mostrarAcumulado}" style="width:50px">
+								<f:selectItem itemLabel="Mostrar" itemValue="true" />
+								<f:selectItem itemLabel="No Mostrar" itemValue="false" />
+							</p:selectOneMenu>
+						</h:outputLabel>
+
+						<h:outputLabel value="#{messages.valor_mm_mayor_a}:" for="itMayor">
+							<h:inputText id="itMayor" label="#{messages.valor_mm_mayor_a}" value="#{precipitacionesIntervaloMB.filterdwSumPorSensorIntervalo.mmFiltro}" style="width:120px" />
+						</h:outputLabel>
+
+					</p:panelGrid>
+
+					<p:panelGrid columns="1" style="width: 40%;">
+
+						<h:panelGroup>
+							<p:commandButton id="cmdSearchSumatoriaIntervalo" ajax="true" value="#{messages.buscar}" actionListener="#{precipitacionesIntervaloMB.searchSumatoriaIntervalo}" icon="ui-icon-search"
+								update=":formPrecipitaciones:messages,:formPrecipitaciones:dtSumatoriaIntervalo, :formPrecipitaciones:chartNivel" />
+
+							<p:commandButton id="cmdCancelFilterSumatoriaIntervalo" ajax="true" value="#{messages.limpiar_filtros}" actionListener="#{precipitacionesIntervaloMB.cancelSearchFilterSumatoriaIntervalo}"
+								icon="ui-icon-refresh" update=" :formPrecipitaciones:chartNivel, :formPrecipitaciones:messages,:formPrecipitaciones:dtSumatoriaIntervalo,panelFiltroSumatoriaIntervalo"
+								oncomplete="document
+							.getElementById('formPrecipitaciones:fechaDesdeSumIntervalo_input').value='';document
+							.getElementById('formPrecipitaciones:fechaHastaSumIntervalo_input').value='';" />
+							
+							 <p:commandButton value="#{messages.info}" icon="ui-icon-help"  type="button" onclick="PF('wvInfo').show();" />
+
+						</h:panelGroup>
+					</p:panelGrid>
+
+
+					<p:panelGrid columns="1" columnClasses="alignTop2Col40,alignTop2Col60" style="width: 100%;">
+
+
+
+
+						<h:panelGroup>
+							<p:chart id="chartNivel" widgetVar="wv_chart_nivel" type="line" model="#{precipitacionesIntervaloMB.dateModel}" style="width:100%;height:600px;display:inline-block;vertical-align: top;">
+							</p:chart>
+							<p:commandButton type="button" value="#{messages.exportar_grafico}" icon="ui-icon-extlink" onclick="exportChart()" />
+						</h:panelGroup>
+
+						<p:dataTable id="dtSumatoriaIntervalo" var="dt" value="#{precipitacionesIntervaloMB.dataModelIntervaloList}" paginator="true" rows="100" lazy="false" editable="false" style="margin-bottom:20px"
+							paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" rowsPerPageTemplate="5,10,15,20,25,50,100,500">
+
+
+							<f:facet name="{Exporters}">
+								<h:commandLink style="vertical-align:middle;float:right;margin-right:1px" title="Exportar datos a excel">
+									<p:graphicImage value="/images/excel-icon.png" width="24" style="text-align:right" />
+									<p:dataExporter type="xls" target="dtSumatoriaIntervalo" fileName="mm_intervalos" pageOnly="false" />
+								</h:commandLink>
+							</f:facet>
+
+							<p:column headerText="#{messages.fecha_hora} desde">
+								<h:outputText value="#{dt.tTimeDesde}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="#{messages.fecha_hora} hasta">
+								<h:outputText value="#{dt.tTimeHasta}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+								</h:outputText>
+							</p:column>
+
+
+							<p:column headerText="#{messages.estacion}" style="text-align:right">
+								<h:outputText value="#{dt.sensor}" />
+							</p:column>
+
+							<!-- styleClass="#{dt.step>0?'CON_LLUVIA':''}" -->
+							<p:column headerText="#{messages.valor} [mm]" style="text-align:right">
+								<h:outputText value="#{dt.step}">
+									<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="#{messages.acumulado} [mm]" style="text-align:right">
+								<h:outputText value="#{dt.acumulado}">
+								</h:outputText>
+							</p:column>
+						</p:dataTable>
+
+					</p:panelGrid>
+
+
+
+				</p:fieldset>
+
+
+
+
+			</h:form>
+
+			<p:dialog widgetVar="dlg" showEffect="fade" width="70%" modal="true" header="#{messages.imagen_grafico}" responsive="true" resizable="true" position="left top">
+				<p:outputPanel id="output" layout="block" />
+			</p:dialog>
+
+			<p:dialog header="#{messages.info_consulta}" widgetVar="wvInfo" minHeight="40" resizable="true" closable="true" maximizable="true"  width="80%"  height="600">
+				
+					<object type="application/pdf" data="docs/InfoConsulta.pdf?pfdrid_c=false" 
+						width="100%" height="100%">						
+						<h:outputLabel value="#{messages.msj_navegador_pdf}"/>
+						<a href="docs/InfoConsulta.pdf">InfoConsulta.pdf</a>
+					</object>
+				
+			</p:dialog>
+
+			<script type="text/javascript">
+				function exportChart() {
+					$('#output').empty().append(PF('wv_chart_nivel').exportAsImage());
+					PF('dlg').show();
+				}
+
+				function extenderA() {
+					this.cfg.seriesDefaults = {
+						rendererOptions : {
+							barWidth : 1,
+							shadowOffset : 0
+						}
+					}
+
+				}
+
+				function extenderB() {
+					this.cfg.seriesDefaults = {
+						rendererOptions : {
+							barWidth : 3,
+							barMargin : 0,
+							barPadding : 0,
+							shadowOffset : 0,
+						},
+						pointLabels : {
+							show : false
+						}
+					}
+				}
+
+				function extenderC() {
+					this.cfg.seriesDefaults = {
+						rendererOptions : {
+							barWidth : 6,
+							barMargin : 0,
+							barPadding : 0,
+							shadowOffset : 0
+						},
+						pointLabels : {
+							show : true
+						}
+					}
+				}
+
+				function extenderD() {
+					this.cfg.seriesDefaults = {
+						rendererOptions : {
+							barWidth : 10,
+							barMargin : 0,
+							barPadding : 0,
+							shadowOffset : 0
+						},
+						pointLabels : {
+							show : true
+						}
+					}
+				}
+			</script>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

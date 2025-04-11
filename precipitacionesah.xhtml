@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+
+			<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+				<f:facet name="start">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+				</f:facet>
+
+				<f:facet name="complete">
+					<h:outputText value="" />
+				</f:facet>
+			</p:ajaxStatus>
+
+
+			<script type="text/javascript">
+				function start() {
+					PF('wvStatusDialog').show();
+				}
+
+				function stop() {
+					PF('wvStatusDialog').hide();
+				}
+			</script>
+
+			<h:form id="formPrecipitacionesAH">
+				<p:messages id="messages" showDetail="true" redisplay="true" closable="true" />
+
+
+				<p:fieldset legend="#{messages['precipitacion_ah']}" style="padding:0.2em 1em;">
+
+
+
+
+					<p:panelGrid columns="1" style="width: 100%">
+
+
+						<p:panelGrid id="panelFiltro" style="width: 40%">
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="#{messages.anio_hidrologico}:" />
+								</p:column>
+
+								<p:column>
+									<h:outputLabel value="#{messages.dia}:" style="vertical-align:top;width:20%" />
+								</p:column>
+
+								<p:column>
+									<h:outputLabel value="#{messages.estacion}:" style=";vertical-align:top;width:20%" />
+								</p:column>
+
+							</p:row>
+							
+							
+							<p:row>
+								<p:column>
+									<p:selectOneMenu id="selPeriodos" value="#{precipitacionesAHMB.ah}" style="width:200px;">
+										<f:selectItems value="#{precipitacionesAHMB.siPeriodos}" />
+									</p:selectOneMenu>
+								</p:column>
+
+								<p:column>
+									<p:selectOneMenu id="selTipoDia" value="#{precipitacionesAHMB.tipoDia}" style="width:200px;">
+										<f:selectItem itemLabel="0-24hs" itemValue="24" />
+										<f:selectItem itemLabel="9-9hs" itemValue="9" />
+									</p:selectOneMenu>
+								</p:column>
+
+								<p:column>
+									<p:selectOneMenu id="selEstaciones" value="#{precipitacionesAHMB.idEstacion}" filter="true"
+										filterMatchMode="contains" style="width:200px;">
+										<f:selectItem itemLabel="SELECCIONE" itemValue="" />
+										<f:selectItems value="#{precipitacionesAHMB.siEstaciones}" />
+									</p:selectOneMenu>
+								</p:column>
+
+							</p:row>
+						</p:panelGrid>
+
+						<p:panelGrid columns="3" style="width: 100%">
+
+							<p:commandButton id="cmdSearchs" ajax="true" value="#{messages.buscar}"
+								actionListener="#{precipitacionesAHMB.search}" icon="ui-icon-search"
+								update=":formPrecipitacionesAH:messages,:formPrecipitacionesAH:dtPrecipitacionesAH" />
+
+							<p:commandButton value="#{messages.exportar_todas_las_estaciones}" ajax="false" style="vertical-align:middle;float:right;margin-right:1px" 
+								onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-arrowthick-1-s">
+								<p:fileDownload value="#{precipitacionesAHMB.file}" />
+							</p:commandButton>
+
+
+							<p:commandButton rendered="false" action="#{precipitacionesAHMB.getCompleteExcel}"
+								value="#{messages.exportar_todas_las_estaciones}" ajax="false"
+								style="vertical-align:middle;float:right;margin-right:1px" icon="ui-icon-arrowstop-1-s" />
+
+							<h:commandLink style="vertical-align:middle;float:right;margin-right:1px"
+								title="#{messages.exportar_estacion_seleccionada}">
+								<p:graphicImage value="/images/excel-icon.png" width="24" style="text-align:right" />
+								<p:dataExporter type="xls" target="dtPrecipitacionesAH" fileName="#{precipitacionesAHMB.nombreArchivo}" />
+							</h:commandLink>
+
+
+						</p:panelGrid>
+
+						<p:panelGrid columns="1" style="width: 100%">
+
+							<p:dataTable id="dtPrecipitacionesAH" var="pah" value="#{precipitacionesAHMB.precipitacionesAHList}"
+								rowStyleClass="#{pah.styleRow}" stickyHeader="true">
+
+
+								<f:facet name="header">
+									<h:outputText value="#{precipitacionesAHMB.nombreListado}" />
+								</f:facet>
+
+								<p:column headerText="#{messages.c_dia}" style="text-align:right;width:22%;font-weight: bold;">
+									<h:outputText value="#{pah.rowLabel}" />
+								</p:column>
+								<p:column headerText="#{messages.c_jul}" style="text-align:right;width:6%">
+									<h:outputText value="#{pah.mmMes07!=null?pah.mmMes07:''}" />
+								</p:column>
+								<p:column headerText="#{messages.c_ago}" style="text-align:right;width:6%">
+									<h:outputText value="#{pah.mmMes08!=null?pah.mmMes08:''}" />
+								</p:column>
+								<p:column headerText="#{messages.c_set}" style="text-align:right;width:6%"
+									styleClass="backColor #{pah.colorMes30}">
+									<h:outputText value="#{pah.mmMes09!=null?pah.mmMes09:' '}" />
+								</p:column>
+								<p:column headerText="#{messages.c_oct}" style="text-align:right;width:6%">
+									<h:outputText value="#{pah.mmMes10!=null?pah.mmMes10:' '}" />
+								</p:column>
+								<p:column headerText="#{messages.c_nov}" style="text-align:right;width:6%"
+									styleClass="backColor #{pah.colorMes30}">
+									<h:outputText value="#{pah.mmMes11!=null?pah.mmMes11:' '}" />
+								</p:column>
+								<p:column headerText="#{messages.c_dic}" style="text-align:right;width:6%">
+									<h:outputText value="#{pah.mmMes12!=null?pah.mmMes12:' '}" />
+								</p:column>
+								<p:column headerText="#{messages.c_ene}" style="text-align:right;width:6%">
+									<h:outputText value="#{pah.mmMes01!=null?pah.mmMes01:' '}" />
+								</p:column>
+								<p:column headerText="#{messages.c_feb}" style="text-align:right;width:6%"
+									styleClass="backColor #{pah.colorFebrero}">
+									<h:outputText value="#{pah.mmMes02!=null?pah.mmMes02:' '}" />
+								</p:column>
+								<p:column headerText="#{messages.c_mar}" style="text-align:right;width:6%">
+									<h:outputText value="#{pah.mmMes03!=null?pah.mmMes03:' '}" />
+								</p:column>
+								<p:column headerText="#{messages.c_abr}" style="text-align:right;width:6%"
+									styleClass="backColor #{pah.colorMes30}">
+									<h:outputText value="#{pah.mmMes04!=null?pah.mmMes04:' '}" />
+								</p:column>
+								<p:column headerText="#{messages.c_may}" style="text-align:right;width:6%">
+									<h:outputText value="#{pah.mmMes05!=null?pah.mmMes05:' '}" />
+								</p:column>
+								<p:column headerText="#{messages.c_jun}" style="text-align:right;width:6%"
+									styleClass="backColor #{pah.colorMes30}">
+									<h:outputText value="#{pah.mmMes06!=null?pah.mmMes06:' '}" />
+								</p:column>
+								<p:column headerText="AÑO" style="text-align:right;width:6%;font-weight: bold;">
+									<h:outputText value="#{pah.total}" />
+								</p:column>
+
+
+
+							</p:dataTable>
+						</p:panelGrid>
+					</p:panelGrid>
+
+				</p:fieldset>
+
+
+
+				<p:dialog modal="true" widgetVar="wvStatusDialog" header="#{messages.msj_espere}..."
+					draggable="false" closable="false" resizable="false">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+				</p:dialog>
+
+
+
+			</h:form>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+			<h:form id="formCharts">
+
+				<p:messages id="messages" showDetail="true" redisplay="true" closable="true" />
+				<p:poll id="poll_update" widgetVar="wv_poll_autoupdate" interval="300" listener="#{limnigramaMonitoreoMB.reload}" update="chartNivel,messages" />
+
+				<p:panelGrid columns="2" style="width: 100%; text-align:left">
+					<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+						<f:facet name="start">
+							<h:graphicImage value="/images/ajaxloadingbar.gif" />
+						</f:facet>
+						<f:facet name="complete">
+							<h:outputText value="" />
+						</f:facet>
+					</p:ajaxStatus>
+					<p:panelGrid columns="1" style="width: 100%; text-align:right">
+						<p:selectBooleanCheckbox styleClass="booleanCheckbox" itemLabel="#{messages.actualizar_automaticamente}" value="#{limnigramaMonitoreoMB.actualizar}">
+							<p:ajax listener="#{limnigramaMonitoreoMB.setAutoUpdate}" update=":formCharts:messages" />
+						</p:selectBooleanCheckbox>
+					</p:panelGrid>
+				</p:panelGrid>
+
+				<p:fieldset legend="#{messages.limnigrama_monitoreo}">
+					<p:panelGrid id="panelFiltro" style="width:100%">
+						<p:row>
+							<p:column style="vertical-align:top; width:15%">
+								<h:outputLabel value="#{messages.fecha_desde}:" />
+								<p:calendar id="fechaDesde" value="#{limnigramaMonitoreoMB.filterdw.tTimeDesde}" mode="inline" pattern="dd/MM/yyyy" locale="#{loginMBean.locale}">
+								</p:calendar>
+							</p:column>
+
+							<p:column style="vertical-align:top; width:15%">
+								<h:outputLabel value="#{messages.fecha_hasta}:" />
+								<p:calendar id="fechaHasta" value="#{limnigramaMonitoreoMB.filterdw.tTimeHasta}" mode="inline" pattern="dd/MM/yyyy" locale="#{loginMBean.locale}">
+								</p:calendar>
+							</p:column>
+
+
+							<p:column style="vertical-align:top; width:60%">
+								<h:outputLabel value="#{messages.sensor}:" />
+								<p:selectOneListbox id="grid3" value="#{limnigramaMonitoreoMB.selectedEstacion}" style="width:100%">
+									<f:selectItems value="#{limnigramaMonitoreoMB.siEstaciones}" var="car" itemLabel="#{car}" itemValue="#{car}" />
+								</p:selectOneListbox>
+
+							</p:column>
+
+							<p:column style="vertical-align:top; width:10%">
+								<h:outputLabel value="#{messages.mostrar_valores_menores_a}:" />
+								<h:inputText value="#{limnigramaMonitoreoMB.filterdw.evoutDataMenorA}" />
+								<p:spacer height="30"></p:spacer>
+
+
+							</p:column>
+
+
+						</p:row>
+
+					</p:panelGrid>
+
+
+					<p:panelGrid style="width: 100%;" columns="2">
+						<p:panelGrid columns="1" style="width: 100%; text-align:left">
+							<p:selectBooleanCheckbox styleClass="booleanCheckbox" itemLabel="#{messages.mostrar_puntos_validos}" value="#{limnigramaMonitoreoMB.mostrarPuntosSerieValidos}" />
+						</p:panelGrid>
+						<p:panelGrid columns="1" style="width: 100%; text-align:right">
+							<p:commandButton id="cmdSearch" ajax="true" value="#{messages.actualizar_limnigrama}" title="#{messages.actualizar_limnigrama}" actionListener="#{limnigramaMonitoreoMB.search}"
+								icon="ui-icon-search" update="chartNivel,messages" />
+						</p:panelGrid>
+					</p:panelGrid>
+
+					<p:remoteCommand name="rc" update="messages,chartNivel" actionListener="#{limnigramaMonitoreoMB.invalidarRegistro}">
+
+					</p:remoteCommand>
+
+
+
+					<p:chart id="chartNivel" widgetVar="wv_chart_nivel" type="line" model="#{limnigramaMonitoreoMB.dateModel}" style="height:400px;">
+						<p:ajax event="itemSelect" listener="#{limnigramaMonitoreoMB.itemSelect}" update="messages" oncomplete="rc()" />
+					</p:chart>
+
+					<p:panelGrid columns="1" style="width:100%">
+						<p:outputLabel value="#{messages.mensaje_limnigrama_validar}" />
+					</p:panelGrid>
+					<p:commandButton type="button" value="#{messages.exportar_grafico}" icon="ui-icon-extlink" onclick="exportChart()" />
+
+				</p:fieldset>
+
+			</h:form>
+
+			<p:dialog widgetVar="dlg" showEffect="fade" width="100%" height="500px" modal="true" header="#{messages.imagen_grafico}" responsive="true" resizable="true" position="left top">
+				<p:outputPanel id="output" layout="block" />
+			</p:dialog>
+
+			<script type="text/javascript">
+				function exportChart() {					
+					$('#output').empty().append(PF('wv_chart_nivel').exportAsImage());					
+					PF('dlg').show();
+				}
+			</script>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

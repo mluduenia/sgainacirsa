@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+			<br></br>
+
+
+			<h:form id="formCuencas">
+				<p:messages id="messages" showDetail="true" />
+
+
+				<p:fieldset legend="#{messages['cuencas']}" style="padding:0.2em 1em;">
+					<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+						<p:panel toggleable="true" header="#{messages.nueva_cuenca}..." style="vertical-align:top" collapsed="true">
+							<p:panelGrid style="width: 100%;" columns="3" columnClasses="colGrid,colGrid,colGrid">
+
+								<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel for="nro" value="#{messages.nro}: " />
+									</h:panelGroup>
+									<p:inputText id="nro" value="#{cuencasMB.oCuencas.nro}" label="#{messages.nro_cuenca}" maxlength="10" />
+
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel for="nombre" value="#{messages.nombre}: " />
+									</h:panelGroup>
+									<p:inputText id="nombre" value="#{cuencasMB.oCuencas.nombre}" label="#{messages.nombre}" />
+
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel for="nombreCorto" value="#{messages.nombre_corto}: " />
+									</h:panelGroup>
+									<p:inputText id="nombreCorto" maxlength="10" value="#{cuencasMB.oCuencas.nombreCorto}"
+										label="#{messages.nombre_corto}" />
+
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel for="ventanaAlerta" value="#{messages.ventana_alerta}: " />
+									</h:panelGroup>
+									<p:inputText id="ventanaAlerta" value="#{cuencasMB.oCuencas.ventanaAlerta}" label="#{messages.ventana_alerta}" />
+
+								</p:panelGrid>
+
+
+								<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+
+
+									<h:outputLabel for="area" value="#{messages.area}: " />
+									<p:inputText id="area" value="#{cuencasMB.oCuencas.area}" label="#{messages.area}" maxlength="10" />
+
+									<h:outputLabel for="perimetro" value="#{messages.perimetro}:  " />
+									<p:inputText id="perimetro" value="#{cuencasMB.oCuencas.perimetro}" label="#{messages.perimetro}" />
+
+									<h:outputLabel for="incluir" value="#{messages.incluir}: " id="incluir" title="#{messages.incluir_title}"/>
+									<p:selectBooleanCheckbox value="#{cuencasMB.oCuencas.incluir}" label="#{messages.incluir}"  />
+
+								</p:panelGrid>
+
+								<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel for="ordinario" value="#{messages.mm_nivel_alerta_ordinario}: " />
+									</h:panelGroup>
+									<p:inputText id="ordinario" value="#{cuencasMB.oCuencas.mmAlertaOrdinario}"
+										label="#{messages.mm_nivel_alerta_ordinario}" maxlength="5" />
+
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel for="moderado" value="#{messages.mm_nivel_alerta_moderado}: " />
+									</h:panelGroup>
+									<p:inputText id="moderado" value="#{cuencasMB.oCuencas.mmAlertaModerado}"
+										label="#{messages.mm_nivel_alerta_moderado}" maxlength="5" />
+
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel for="elevado" value="#{messages.mm_nivel_alerta_elevado}: " />
+									</h:panelGroup>
+									<p:inputText id="elevado" value="#{cuencasMB.oCuencas.mmAlertaElevado}"
+										label="#{messages.mm_nivel_alerta_elevado}" maxlength="5" />
+
+								</p:panelGrid>
+
+							</p:panelGrid>
+
+							<p:panelGrid style="width: 100%;text-align: right;" columns="1">
+								<p:commandButton value="#{messages.agregar_cuenca}" action="#{cuencasMB.addCuencas}" icon="ui-icon-plus"
+									update="messages,formCuencas,dtCuencas,dtEstaciones" />
+
+							</p:panelGrid>
+
+						</p:panel>
+					</sec:authorize>
+					<p:spacer height="5px;" />
+
+
+					<p:panelGrid columns="1" style="width: 100%;">
+
+						<p:dataTable id="dtCuencas" var="cuenca" value="#{cuencasMB.cuencasList}" paginator="true" rows="5" lazy="false"
+							paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+							rowsPerPageTemplate="5,10,15,20,25,50" rowKey="#{cuenca.id}" editable="true" resizeMode="expand"
+							resizableColumns="true">
+
+							<p:ajax event="rowEdit" listener="#{cuencasMB.onRowEdit}" update=":formCuencas:messages" />
+							<p:ajax event="rowEditCancel" listener="#{cuencasMB.onRowCancel}" update=":formCuencas:messages" />
+							<p:ajax event="page" update=":formCuencas:dtEstaciones" listener="#{cuencasMB.updatePage}" />
+
+							<p:column headerText="#{messages.nro}" sortBy="#{cuenca.nro}" style="width:5%">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{cuenca.nro}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{cuenca.nro}" label="#{messages.nro_cuenca}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="#{messages.nombre}" sortBy="#{cuenca.nombre}" style="width:15%">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{cuenca.nombre}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{cuenca.nombre}" label="#{messages.nombre}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="" style="width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.nombre_corto_br}" title="#{messages.nombre_corto}" escape="false" />
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{cuenca.nombreCorto}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{cuenca.nombreCorto}" label="#{messages.nombre_corto}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="#{messages.incluir}" style="width:5%;text-align:center">
+								<f:facet name="header">
+									<h:outputText value="#{messages.incluir}" title="#{messages.incluir_title}" />
+								</f:facet>
+
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:selectBooleanCheckbox value="#{cuenca.incluir}" disabled="true" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectBooleanCheckbox value="#{cuenca.incluir}" label="#{messages.incluir}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+
+							<p:column headerText="" style="text-align:right;width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.area_br}" title="#{messages.area_br}" escape="false" />
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{cuenca.area}">
+											<f:convertNumber maxFractionDigits="10" minFractionDigits="0" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{cuenca.area}" label="#{messages.area}">
+											<f:convertNumber maxFractionDigits="10" minFractionDigits="0" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="" style="text-align:right;width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.perimetro_br}" title="#{messages.perimetro_br}" escape="false" />
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{cuenca.perimetro}">
+											<f:convertNumber maxFractionDigits="10" minFractionDigits="0" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{cuenca.perimetro}" label="#{cuenca.perimetro}">
+											<f:convertNumber maxFractionDigits="10" minFractionDigits="0" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+
+							<p:column headerText="#{messages.ventana_alerta_br}" sortBy="#{cuenca.ventanaAlerta}"
+								style="text-align:right;width:5%">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{cuenca.ventanaAlerta}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{cuenca.ventanaAlerta}" label="#{messages.ventana_alerta}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+
+							<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+								<p:column headerText="" style="text-align:right;width:5%">
+									<f:facet name="header">
+										<h:outputText value="#{messages.mm_nivel_alerta_ordinario_br}" title="#{messages.mm_nivel_alerta_ordinario}"
+											escape="false" />
+									</f:facet>
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{cuenca.mmAlertaOrdinario}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{cuenca.mmAlertaOrdinario}" label="#{messages.mm_nivel_alerta_ordinario}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="" style="text-align:right;width:5%">
+									<f:facet name="header">
+										<h:outputText value="#{messages.mm_nivel_alerta_moderado_br}" title="#{messages.mm_nivel_alerta_moderado}"
+											escape="false" />
+									</f:facet>
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{cuenca.mmAlertaModerado}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{cuenca.mmAlertaModerado}" label="#{messages.mm_nivel_alerta_moderado}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="" style="text-align:right;width:5%">
+									<f:facet name="header">
+										<h:outputText value="#{messages.mm_nivel_alerta_elevado_br}" title="#{messages.mm_nivel_alerta_elevado}"
+											escape="false" />
+									</f:facet>
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{cuenca.mmAlertaElevado}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{cuenca.mmAlertaElevado}" label="#{messages.mm_nivel_alerta_elevado}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column rendered="false" headerText="Hc" sortBy="#{cuenca.hc}" style="text-align:right;width:5%">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{cuenca.hc}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{cuenca.hc}" label="Hc" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column rendered="false" headerText="#{messages.ecuacion_h_menor_hc}" style="text-align:right;width:5%">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{cuenca.ecuacionHMenorHc.id}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{cuenca.ecuacionHMenorHc.id}" label="#{messages.ecuacion_h_menor_hc}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column rendered="false" headerText="#{messages.ecuacion_h_mayor_hc}" style="text-align:right;width:5%">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{cuenca.ecuacionHMayorHc.id}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{cuenca.ecuacionHMayorHc.id}" label="#{messages.ecuacion_h_mayor_hc}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+							</sec:authorize>
+
+							<p:column style="text-align:center;width:5%">
+
+								<f:facet name="header">
+									<h:outputText value="#{messages.ver_estaciones}" title="#{messages.ver_estaciones}" escape="false" />
+								</f:facet>
+								<p:commandButton id="cmdVerEstaciones" icon="ui-icon-circlesmall-plus"
+									title="Seleccionar Cuenca / Ver estaciones" alt="Ver estaciones"
+									actionListener="#{cuencasMB.searchEstaciones(cuenca)}" update=":formCuencas:messages,:formCuencas:dtEstaciones">
+
+								</p:commandButton>
+
+							</p:column>
+
+							<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+								<p:column style="text-align:center; width:5%" headerText="#{messages.editar}">
+									<p:rowEditor editTitle="#{messages.editar}" saveTitle="#{messages.guardar_cambios}"
+										cancelTitle="#{messages.cancelar_edicion}" />
+								</p:column>
+
+								<p:column style="text-align:center; width:5%" headerText="#{messages.borrar}">
+									<p:commandButton id="cmdBorrarCuenca" title="#{messages.borrar}" icon="ui-icon-trash"
+										actionListener="#{cuencasMB.deleteCuenca(cuenca)}"
+										update=":formCuencas:messages,:formCuencas:dtCuencas,:formCuencas:dtEstaciones">
+										<p:confirm header="Confirmación" message="¿Desea borrar la cuenca nro. #{cuenca.nro}?" icon="ui-icon-alert" />
+									</p:commandButton>
+
+								</p:column>
+							</sec:authorize>
+
+						</p:dataTable>
+					</p:panelGrid>
+					<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+						<p:panelGrid columns="1" style="width: 80%;valign:top">
+
+							<p:row>
+								<p:column>
+									<p:selectOneMenu id="selEstaciones" value="#{cuencasMB.estacionSeleccionada.id}" filter="true"
+										filterMatchMode="contains" style="width:300px;vertical-align:middle">
+										<f:selectItem itemLabel="SELECCIONE ESTACIÓN" itemValue="" />
+										<f:selectItems value="#{cuencasMB.siEstaciones}" />
+									</p:selectOneMenu>
+								</p:column>
+
+								<p:column>
+									<p:commandButton id="cmdAddEstacion" icon="ui-icon-plus" style="vertical-align:middle;margin-left:10px"
+										value="#{messages.agregar_a_cuenca}" action="#{cuencasMB.addEstacionesCuencas}"
+										update=":formCuencas:messages,:formCuencas:dtEstaciones">
+									</p:commandButton>
+								</p:column>
+
+							</p:row>
+
+
+
+						</p:panelGrid>
+					</sec:authorize>
+					<p:panelGrid columns="1" style="width: 100%;">
+
+						<p:dataTable id="dtEstaciones" var="ec" value="#{cuencasMB.estacionesList}" rowKey="#{estacion.id}"
+							editable="true">
+
+							<p:ajax event="rowEdit" listener="#{cuencasMB.onRowEditEstacion}" update=":formCuencas:messages" />
+							<p:ajax event="rowEditCancel" listener="#{cuencasMB.onRowCancel}" update=":formCuencas:messages" />
+
+							<f:facet name="header">
+								<h:outputText value="Cuenca #{cuencasMB.cuencaSeleccionada.nro} - #{cuencasMB.cuencaSeleccionada.nombre}" />
+
+							</f:facet>
+
+							<p:column rendered="false" headerText="#{messages.id}" sortBy="#{ec.estaciones.id}" style="width:10%">
+								<h:outputText value="#{ec.estaciones.id}" />
+							</p:column>
+
+							<p:column headerText="#{messages.codigo}" sortBy="#{ec.estaciones.codigo}" style="width:15%">
+								<h:outputText value="#{ec.estaciones.codigo}" />
+							</p:column>
+
+
+							<p:column headerText="#{messages.nombre_estacion}" sortBy="#{ec.estaciones.nombre}" style="width:35%">
+								<h:outputText value="#{ec.estaciones.nombre}" />
+							</p:column>
+
+							<p:column headerText="#{messages.tipo}" sortBy="#{ec.estaciones.tipo}" style="width:10%">
+								<h:outputText value="#{ec.estaciones.tipo}" />
+							</p:column>
+
+							<p:column headerText="#{messages.area}" sortBy="#{ec.area}" style="width:10%;text-align:right">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ec.area}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ec.area}" label="#{messages.area}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+								<p:column style="text-align:center; width:45px" headerText="#{messages.editar}">
+									<p:rowEditor editTitle="#{messages.editar}" saveTitle="#{messages.guardar_cambios}"
+										cancelTitle="#{messages.cancelar_edicion}" />
+								</p:column>
+
+								<p:column style="text-align:center" headerText="#{messages.borrar}">
+									<p:commandButton id="cmdBorrarEstacionEnCuenca" title="#{messages.borrar}" icon="ui-icon-trash"
+										actionListener="#{cuencasMB.deleteEstacionCuenca(ec)}"
+										update=":formCuencas:messages,:formCuencas:dtEstaciones">
+										<p:confirm header="Confirmación" message="¿Desea borrar el registro?" icon="ui-icon-alert" />
+									</p:commandButton>
+
+								</p:column>
+							</sec:authorize>
+
+						</p:dataTable>
+					</p:panelGrid>
+				</p:fieldset>
+
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+					<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+
+			</h:form>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

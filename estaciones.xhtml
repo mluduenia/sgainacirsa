@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+			<br></br>
+
+
+
+			<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+				<f:facet name="start">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+				</f:facet>
+
+				<f:facet name="complete">
+					<h:outputText value="" />
+				</f:facet>
+			</p:ajaxStatus>
+
+			<h:form id="formEstaciones">
+				<p:messages id="messages" showDetail="true" redisplay="true" closable="true" />
+
+				<p:fieldset legend="#{messages.estaciones}" style="padding:0.2em 1em">
+					<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+						<p:panel toggleable="true" header="#{messages.nueva_estacion}..." style="vertical-align:top" collapsed="true">
+							<p:panelGrid style="width: 100%;" columns="3" columnClasses="colGrid,colGrid,colGrid">
+
+								<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel for="codigo" value="#{messages.codigo}: " />
+									</h:panelGroup>
+									<p:inputText id="codigo" value="#{estacionesMB.oEstaciones.codigo}" label="#{messages.codigo}" maxlength="10" />
+
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel for="nombre" value="#{messages.nombre}: " />
+									</h:panelGroup>
+									<p:inputText id="nombre" value="#{estacionesMB.oEstaciones.nombre}" label="#{messages.nombre}" />
+
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel for="nombreCorto" value="#{messages.nombre_corto}: " />
+									</h:panelGroup>
+									<p:inputText id="nombreCorto" value="#{estacionesMB.oEstaciones.nombreCorto}" label="#{messages.nombre_corto}" />
+
+
+
+								</p:panelGrid>
+
+								<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel for="tipo" value="#{messages.tipo}: " />
+									</h:panelGroup>
+									<h:selectOneMenu value="#{estacionesMB.oEstaciones.tipo}" label="#{messages.tipo}" id="tipo">
+										<f:selectItem itemValue="LLUVIA" itemLabel="LLUVIA" />
+										<f:selectItem itemValue="NIVEL" itemLabel="NIVEL" />
+									</h:selectOneMenu>
+
+
+									<h:outputLabel for="activo" value="#{messages.activo}: " id="activo" />
+									<p:selectBooleanCheckbox value="#{estacionesMB.oEstaciones.activo}" label="#{messages.activo}" />
+
+									<h:outputLabel for="contador" value="#{messages.contador}: " />
+									<p:inputText id="contador" value="#{estacionesMB.oEstaciones.contador}" label="#{messages.contador}" />
+
+
+								</p:panelGrid>
+
+								<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+
+									<h:outputLabel for="pmp" value="#{messages.pmp}: " />
+									<p:inputText id="pmp" value="#{estacionesMB.oEstaciones.pmp}" label="#{messages.pmp}" title="#{messages.pmp_title}" />
+
+									<h:outputLabel for="msnm" value="#{messages.msnm}: " />
+									<p:inputText id="msnm" value="#{estacionesMB.oEstaciones.msnm}" label="#{messages.msnm}" />
+
+									<h:outputLabel for="latitud" value="#{messages.latitud}: " />
+									<p:inputText id="latitud" value="#{estacionesMB.oEstaciones.latitude}" label="#{messages.latitud}" />
+
+									<h:outputLabel for="longitud" value="#{messages.longitud}: " />
+									<p:inputText id="longitud" value="#{estacionesMB.oEstaciones.longitude}" label="#{messages.longitud}" />
+								</p:panelGrid>
+
+
+
+							</p:panelGrid>
+
+							<p:panelGrid style="width: 100%;text-align: right;" columns="1">
+								<p:commandButton value="#{messages.agregar_estacion}" action="#{estacionesMB.addEstaciones}" icon="ui-icon-plus" update="messages,formEstaciones,dtEstaciones" />
+
+							</p:panelGrid>
+
+						</p:panel>
+
+					</sec:authorize>
+					<p:spacer height="5px;" />
+
+					<p:panelGrid columns="1" style="width: 100%;">
+
+						<p:dataTable id="dtEstaciones" var="estacion" value="#{estacionesMB.estacionesList}" paginator="true" rows="10" lazy="false" editable="true" scrollable="true" scrollWidth="100%"
+							resizableColumns="true" resizeMode="expand" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}"
+							rowsPerPageTemplate="5,10,15,20,25,50" rowKey="#{estacion.id}" widgetVar="estacionesTable">
+
+
+							<f:facet name="{Exporters}">
+								<h:commandLink style="vertical-align:middle;float:right;margin-right:1px" title="Exportar datos a excel">
+									<p:graphicImage value="/images/excel-icon.png" width="24" style="text-align:right" />
+									<p:dataExporter type="xls" target="dtEstaciones" fileName="listadoEstaciones" postProcessor="#{estacionesMB.postProcessXLS}" />
+								</h:commandLink>
+							</f:facet>
+
+
+							<p:ajax event="rowEdit" listener="#{estacionesMB.onRowEdit}" update=":formEstaciones:messages" />
+							<p:ajax event="rowEditCancel" listener="#{estacionesMB.onRowCancel}" update=":formEstaciones:messages" />
+
+
+							<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+
+								<p:column style="text-align:center; width:32px">
+									<p:rowEditor editTitle="#{messages.editar}" saveTitle="#{messages.guardar_cambios}" cancelTitle="#{messages.cancelar_edicion}" />
+								</p:column>
+
+								<p:column style="text-align:center; width:32px">
+									<p:commandButton id="cmdBorrarEstacion" icon="ui-icon-trash" title="#{messages.borrar}" actionListener="#{estacionesMB.deleteEstacion(estacion)}"
+										update=":formEstaciones:messages,:formEstaciones:dtEstaciones">
+										<p:confirm header="Confirmación" message="¿Desea borrar el registro nro #{estacion.codigo}?" icon="ui-icon-alert" />
+									</p:commandButton>
+								</p:column>
+
+
+								<p:column headerText="#{messages.activo}" sortBy="#{estacion.activo}" style="text-align:center; width:5%" filterable="true" filterBy="#{estacion.activo}" filterMatchMode="exact">
+									
+									<f:facet name="filter">
+										<p:selectOneMenu onchange="PF('estacionesTable').filter()">
+											<f:converter converterId="javax.faces.Boolean" />
+											<f:selectItem itemLabel="Todas" itemValue="" />
+											<f:selectItem itemLabel="Activa" itemValue="true" />
+											<f:selectItem itemLabel="No activas" itemValue="false" />
+										</p:selectOneMenu>
+									</f:facet>
+									<p:commandButton icon="ui-icon-signal-diag" style="#{estacion.activo?'background-color: green':'background-color: red'}"
+										title="#{estacion.activo?'Setear como No Activo':'Setear como Activo'}" actionListener="#{estacionesMB.changeActivo(estacion)}" update=":formEstaciones:messages,:formEstaciones:dtEstaciones" />
+								</p:column>
+
+								<p:column headerText="#{messages.mantenimiento}" sortBy="#{estacion.enMantenimiento}" style="text-align:center; width:5%" filterable="true" filterBy="#{estacion.enMantenimiento}"  filterMatchMode="exact">
+								<f:facet name="filter">
+										<p:selectOneMenu onchange="PF('estacionesTable').filter()">
+											<f:converter converterId="javax.faces.Boolean" />
+											<f:selectItem itemLabel="Todas" itemValue="" />
+											<f:selectItem itemLabel="En mantenimiento" itemValue="true" />
+											<f:selectItem itemLabel="Fuera de mantenimiento" itemValue="false" />
+										</p:selectOneMenu>
+									</f:facet>
+									<p:commandButton icon="ui-icon-wrench" style="#{estacion.enMantenimiento?'background-color: red':'background-color: green'}"
+										title="#{estacion.enMantenimiento?messages.fin_mantenimiento:messages.inicio_mantenimiento}" actionListener="#{estacionesMB.changeEnMantenimiento(estacion)}"
+										update=":formEstaciones:messages,:formEstaciones:dtEstaciones" />
+								</p:column>
+
+							</sec:authorize>
+
+							<p:column rendered="false" headerText="#{messages.id}" sortBy="#{estacion.id}" style="width:5%">
+								<h:outputText value="#{estacion.id}" />
+							</p:column>
+
+							<p:column headerText="#{messages.codigo}" sortBy="#{estacion.codigo}" style="width:5%" filterable="true" filterBy="#{estacion.codigo}" footerText="Igual a" filterMatchMode="exact">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{estacion.codigo}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{estacion.codigo}" label="#{messages.codigo}" maxlength="10" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="#{messages.nombre}" sortBy="#{estacion.nombre}" style="width:10%" filterBy="#{estacion.nombre}" footerText="Contiene" filterMatchMode="contains">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{estacion.nombre}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{estacion.nombre}" label="#{messages.nombre}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="#{messages.nombre_corto}" sortBy="#{estacion.nombreCorto}" style="width:5%" filterBy="#{estacion.nombreCorto}" footerText="Contiene" filterMatchMode="contains">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{estacion.nombreCorto}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{estacion.nombreCorto}" label="#{messages.nombre_corto}" maxlength="10" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="#{messages.tipo}" sortBy="#{estacion.tipo}" style="width:5%" filterBy="#{estacion.tipo}" footerText="Igual a" filterMatchMode="exact">
+								<f:facet name="filter">
+									<p:selectOneMenu onchange="PF('estacionesTable').filter()">
+										<f:selectItem itemLabel="TODOS" itemValue="#{null}" noSelectionOption="true" />
+										<f:selectItems value="#{estacionesMB.tipos}" />
+									</p:selectOneMenu>
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{estacion.tipo}" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectOneMenu value="#{estacion.tipo}" style="width:100%" label="#{messages.tipo}">
+											<f:selectItem itemValue="LLUVIA" itemLabel="LLUVIA" />
+											<f:selectItem itemValue="NIVEL" itemLabel="NIVEL" />
+										</h:selectOneMenu>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="#{messages.activo}" rendered="false" sortBy="#{estacion.activo}" style="width:5%;text-align:center">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:selectBooleanCheckbox value="#{estacion.activo}" disabled="true" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectBooleanCheckbox value="#{estacion.activo}" label="#{messages.activo}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="#{messages.en_mantenimiento}" rendered="false" sortBy="#{estacion.enMantenimiento}" style="width:5%;text-align:center">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:selectBooleanCheckbox value="#{estacion.enMantenimiento}" disabled="true" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectBooleanCheckbox value="#{estacion.enMantenimiento}" label="#{messages.en_mantenimiento}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+
+								<p:column headerText="#{messages.contador}" sortBy="#{estacion.contador}" style="width:5%;text-align:right" rendered="true">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.contador}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText rendered="#{estacion.tipo=='LLUVIA'}" value="#{estacion.contador}" label="#{messages.contador}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+								<!-- Rojo/Naranja/Amarillo 6hs -->
+								<p:column headerText="R6hs" style="width:5%" sortBy="#{estacion.rojo6h}" >
+									<f:facet name="header">
+										<h:outputText value="R6hs" title="Rojo 6hs" />
+									</f:facet>
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.rojo6h}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.rojo6h}" label="Rojo 6hs">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</p:inputText>
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+
+								<p:column headerText="N6hs" style="width:5%" sortBy="#{estacion.naranja6h}" >
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.naranja6h}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.naranja6h}" label="Naranja 6hs">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</p:inputText>
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+
+								<p:column headerText="A6hs" style="width:5%" sortBy="#{estacion.amarillo6h}" >
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.amarillo6h}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.amarillo6h}" label="Amarillo 6hs">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</p:inputText>
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<!-- Rojo/Naranja/Amarillo 3hs -->
+
+								<p:column headerText="R3hs" style="width:5%" sortBy="#{estacion.rojo3h}" >
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.rojo3h}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.rojo3h}" label="Rojo 3hs">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</p:inputText>
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+
+								<p:column headerText="N3hs" style="width:5%" sortBy="#{estacion.naranja3h}" >
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.naranja3h}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.naranja3h}" label="Naranja 3hs">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</p:inputText>
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+
+								<p:column headerText="A3hs" style="width:5%" sortBy="#{estacion.amarillo3h}" >
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.amarillo3h}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.amarillo3h}" label="Amarillo 3hs">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</p:inputText>
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+
+								<!-- Rojo/Naranja/Amarillo 1h -->
+
+								<p:column headerText="R1h" style="width:5%" sortBy="#{estacion.rojo1h}" >
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.rojo1h}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.rojo1h}" label="Rojo 1h">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</p:inputText>
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+
+								<p:column headerText="N1h" style="width:5%" sortBy="#{estacion.naranja1h}" >
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.naranja1h}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.naranja1h}" label="Naranja 1h">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</p:inputText>
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+
+								<p:column headerText="A1h" style="width:5%" sortBy="#{estacion.amarillo1h}" >
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.amarillo1h}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.amarillo1h}" label="Amarillo 1h">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</p:inputText>
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+
+								<p:column headerText="#{messages.pmp_sigla}" sortBy="#{estacion.pmp}" style="width:5%">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.pmp}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText rendered="#{estacion.tipo=='LLUVIA'}" value="#{estacion.pmp}" label="#{messages.pmp}" title="#{messages.pmp_title}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="#{messages.relacionhq}" style="width:5%">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.formulaQ}" label="#{messages.relacionhq}" title="#{estacion.formulaQ}" />
+
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText rendered="#{estacion.tipo=='NIVEL'}" value="#{estacion.formulaQ}" label="#{messages.relacionhq}" title="#{messages.relacionhq_title}" />
+										</f:facet>
+									</p:cellEditor>
+
+
+								</p:column>
+
+
+
+								<p:column headerText="#{messages.latitud}" sortBy="#{estacion.latitude}" style="width:5%" rendered="true">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.latitude}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.latitude}" label="#{messages.latitude}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="#{messages.longitud}" sortBy="#{estacion.longitude}" style="width:5%" rendered="true">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.longitude}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.longitude}" label="#{messages.longitud}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="#{messages.msnm}" sortBy="#{estacion.msnm}" style="width:5%;text-align:right" rendered="true">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{estacion.msnm}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{estacion.msnm}" label="#{messages.msn}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+							</sec:authorize>
+
+
+
+						</p:dataTable>
+
+
+					</p:panelGrid>
+
+
+
+				</p:fieldset>
+
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+					<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+
+
+
+			</h:form>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+			
+			<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+				<f:facet name="start">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+				</f:facet>
+
+				<f:facet name="complete">
+					<h:outputText value="" />
+				</f:facet>
+			</p:ajaxStatus>
+
+			<h:form id="formEcuaciones">
+				<p:messages id="messages" showDetail="true" redisplay="true" closable="true" />
+
+
+				<p:fieldset legend="#{messages['ecuaciones']}" style="padding:0.2em 1em;">
+
+					<p:panel toggleable="true" header="Nueva ecuación..." style="vertical-align:top" collapsed="true">
+						<p:panelGrid style="width: 100%;" columns="3" columnClasses="colGrid,colGrid,colGrid">
+
+							<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+								<h:panelGroup>
+									<h:outputLabel value="* " styleClass="requerido" />
+									<h:outputLabel for="nombre" value="#{messages.nombre}: " />
+								</h:panelGroup>
+								<p:inputText id="nombre" value="#{ecuacionesMB.oEcuaciones.nombre}" />
+
+								<h:outputLabel for="ecuacionCrecidaM" value="#{messages.ecuacion_crecida}:" />
+								<p:inputText id="ecuacionCrecidaM" value="#{ecuacionesMB.oEcuaciones.ecuacionCrecidaM}"
+									label="#{messages.ecuacion_crecida_m}" />
+
+
+								<h:outputLabel for="ecuacionHoraPico" value="#{messages.ecuacion_hora_pico}:" />
+								<p:inputText id="ecuacionHoraPico" value="#{ecuacionesMB.oEcuaciones.ecuacionHoraPico}"
+									label="#{messages.ecuacion_hora_pico}" />
+
+
+							</p:panelGrid>
+
+							<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+
+
+								<h:outputLabel for="a1" value="a1: " />
+								<p:inputText id="a1" value="#{ecuacionesMB.oEcuaciones.variableAlpha1}" label="a1" />
+
+								<h:outputLabel for="a2" value="a2: " />
+								<p:inputText id="a2" value="#{ecuacionesMB.oEcuaciones.variableAlpha2}" label="a2" />
+
+								<h:outputLabel for="a3" value="a3: " />
+								<p:inputText id="a3" value="#{ecuacionesMB.oEcuaciones.variableAlpha3}" label="a3" />
+
+								<h:outputLabel for="a4" value="a4: " />
+								<p:inputText id="a4" value="#{ecuacionesMB.oEcuaciones.variableAlpha4}" label="a4" />
+
+
+
+							</p:panelGrid>
+
+
+							<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+
+								<h:outputLabel for="b1" value="b1: " />
+								<p:inputText id="b1" value="#{ecuacionesMB.oEcuaciones.variableBeta1}" label="b1" />
+
+								<h:outputLabel for="b2" value="b2: " />
+								<p:inputText id="b2" value="#{ecuacionesMB.oEcuaciones.variableBeta2}" label="b2" />
+
+								<h:outputLabel for="b3" value="b3: " />
+								<p:inputText id="b3" value="#{ecuacionesMB.oEcuaciones.variableBeta3}" label="b3" />
+
+								<h:outputLabel for="b4" value="b4: " />
+								<p:inputText id="b4" value="#{ecuacionesMB.oEcuaciones.variableBeta4}" label="b4" />
+
+								<h:outputLabel for="b5" value="b5: " />
+								<p:inputText id="b5" value="#{ecuacionesMB.oEcuaciones.variableBeta5}" label="b5" />
+								
+								<h:outputLabel for="b6" value="b6: " />
+								<p:inputText id="b6" value="#{ecuacionesMB.oEcuaciones.variableBeta6}" label="b6" />
+								
+
+							</p:panelGrid>
+						</p:panelGrid>
+						<p:panelGrid style="width:100%;text-align: right;overflow:auto;" columns="1">
+							<p:commandButton value="#{messages.agregar_ecuacion}" action="#{ecuacionesMB.addEcuaciones}" icon="ui-icon-plus"
+								update="messages,formEcuaciones,dtEcuaciones" />
+						</p:panelGrid>
+					</p:panel>
+
+					<p:panelGrid columns="1" style="width: 100%;overflow:auto">
+
+						<p:dataTable id="dtEcuaciones" var="ecuacion" value="#{ecuacionesMB.ecuacionesList}" paginator="true" rows="15"
+							lazy="false" editable="true" scrollable="true" scrollWidth="100%" resizeMode="expand" resizableColumns="true"
+							paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+							rowsPerPageTemplate="5,10,15,20,25,50" rowKey="#{ecuacion.id}">
+
+							<p:ajax event="rowEdit" listener="#{ecuacionesMB.onRowEdit}" update=":formEcuaciones:messages" />
+							<p:ajax event="rowEditCancel" listener="#{ecuacionesMB.onRowCancel}" update=":formEcuaciones:messages" />
+
+
+							<p:column headerText="#{messages.id}" sortBy="#{ecuacion.id}" style="width:40px">
+								<h:outputText value="#{ecuacion.id}" title="#{ecuacion.ecuacionCrecidaM} , #{ecuacion.ecuacionHoraPico}" />
+							</p:column>
+
+							<p:column rendered="false" style="text-align:center" headerText="#{messages.fecha}"
+								sortBy="#{ecuacion.fechaAlta}">
+								<h:outputText value="#{ecuacion.fechaAlta}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+								</h:outputText>
+							</p:column>
+
+
+							<p:column rendered="true" headerText="#{messages.nombre}" style="width:200px">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.nombre}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.nombre}" label="#{messages.nombre}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+
+							<p:column rendered="true" headerText="#{messages.ecuacion_crecida}:" 
+								style="width:200px">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.ecuacionCrecidaM}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.ecuacionCrecidaM}" label="#{messages.ecuacion_nivel}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column rendered="true" headerText="#{messages.ecuacion_hora_pico}"
+								style="width:200px">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.ecuacionHoraPico}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.ecuacionHoraPico}" label="#{messages.ecuacion_hora_pico}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="a1" sortBy="#{ecuacion.variableAlpha1}" style="text-align:right">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.variableAlpha1}">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.variableAlpha1}" label="a1">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="a2" sortBy="#{ecuacion.variableAlpha2}" style="text-align:right">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.variableAlpha2}">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.variableAlpha2}" label="a2">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="a3" sortBy="#{ecuacion.variableAlpha3}" style="text-align:right">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.variableAlpha3}">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.variableAlpha3}" label="a3">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="a4" sortBy="#{ecuacion.variableAlpha4}" style="text-align:right">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.variableAlpha4}">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.variableAlpha4}" label="a4">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="b1" sortBy="#{ecuacion.variableBeta1}" style="text-align:right">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.variableBeta1}">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.variableBeta1}" label="b1">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="b2" sortBy="#{ecuacion.variableBeta2}" style="text-align:right">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.variableBeta2}">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.variableBeta2}" label="b2">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="b3" sortBy="#{ecuacion.variableBeta3}" style="text-align:right">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.variableBeta3}">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.variableBeta3}" label="b3">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="b4" sortBy="#{ecuacion.variableBeta4}" style="text-align:right">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.variableBeta4}">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.variableBeta4}" label="b4">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="b5" sortBy="#{ecuacion.variableBeta5}" style="text-align:right">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.variableBeta5}">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.variableBeta5}" label="b5">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							
+							<p:column headerText="b6" sortBy="#{ecuacion.variableBeta6}" style="text-align:right">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{ecuacion.variableBeta6}">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{ecuacion.variableBeta6}" label="b6">
+											<f:convertNumber maxFractionDigits="10" groupingUsed="false" locale="en" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							
+
+							<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+								<p:column style="text-align:center; width:32px">
+									<p:rowEditor editTitle="#{messages.editar}" saveTitle="#{messages.guardar_cambios}" cancelTitle="#{messages.cancelar_edicion}"/>
+								</p:column>
+
+								<p:column style="text-align:center">
+
+									<p:commandButton id="cmdBorrarEcuacion" icon="ui-icon-trash" title="#{messages.borrar}"
+										actionListener="#{ecuacionesMB.deleteEcuacion(ecuacion)}"
+										update=":formEcuaciones:messages,:formEcuaciones:dtEcuaciones">
+										<p:confirm header="Confirmación" message="¿Desea borrar el registro con id #{ecuacion.id}?"
+											icon="ui-icon-alert" />
+									</p:commandButton>
+
+								</p:column>
+							</sec:authorize>
+						</p:dataTable>
+					</p:panelGrid>
+
+				</p:fieldset>
+
+
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+					<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+
+			</h:form>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

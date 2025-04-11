@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+<head>
+<title>SGA</title>
+</head>
+<body>
+
+	<ui:composition>
+
+
+
+		<h:form>
+
+
+			<p:menubar id="menu">
+				<p:menuitem icon="ui-icon-home" outcome="index" />
+
+				<sec:authorize access="hasAnyRole('OPERADOR','ADMIN','SUPERVISOR')">
+					<p:submenu label="#{messages.monitoreo}" icon=" ui-icon-signal-diag">
+						<p:menuitem value="#{messages.datos_dw}" outcome="precipitaciones" />
+
+						<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+							<p:menuitem value="#{messages.limnigrama_monitoreo}" outcome="limnigramaMonitoreo" />
+						</sec:authorize>
+
+						<p:menuitem value="#{messages.amenazas_calculadas}" outcome="alertas" />
+						<p:menuitem value="#{messages.limnigrama_dia_sensor}" outcome="grafico" />
+						<p:menuitem value="#{messages.limnigrama_intervalo_dias}" outcome="limnigramaIntervalo" />
+						<p:menuitem value="#{messages.hidrograma_intervalo_dias}" outcome="hidrogramaIntervalo" rendered="true" />
+						<p:menuitem value="#{messages.consulta_sumarizacion_estacion_intervalo}" outcome="precipitacionesIntervalo" />
+						<p:menuitem value="#{messages.consulta_precipitacion_anio_hidrologico}" outcome="precipitacionesah" />
+						<p:menuitem value="#{messages.lluvias_mensuales}" outcome="lluviasMensuales" rendered="false" />
+					</p:submenu>
+
+					<p:submenu label="#{messages.mapas}" icon="ui-icon-document" rendered="true">
+						<p:menuitem value="#{messages.mapas_amenazas}" outcome="mapas" />
+						<p:menuitem value="#{messages.severidad_local}" outcome="mapaAEstaciones631" />
+						<p:menuitem value="#{messages.lluvias_intervalo_fechas}" outcome="mapaEstacionesFI" />
+						<p:menuitem value="#{messages.lluvias_ultimas_24_pmp}" outcome="mapaEstaciones24pmp" />
+						<p:menuitem value="#{messages.radar_cordoba}" outcome="mapaRadar" />
+						<p:menuitem value="#{messages.radar_cordoba_acum}" outcome="mapaRadarAcum" />
+					</p:submenu>
+
+					<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+						<p:submenu label="#{messages.consulta_historica}" icon="ui-icon-document" rendered="true">
+							<p:menuitem value="#{messages.amenazas_calculadas_historico}" outcome="mapaACuencasFecha" icon="ui-icon-locked" />
+							<p:menuitem value="#{messages.severidad_local_historico}" outcome="mapaSeveridadLocal" icon="ui-icon-locked" />
+							<p:menuitem value="#{messages.lluvias_ultimas_24_pmp}" outcome="mapaEstaciones24pmp" icon="ui-icon-locked" />
+
+						</p:submenu>
+					</sec:authorize>
+
+					<p:submenu label="#{messages.diseno_hidrologico}" icon="ui-icon-document" rendered="true">
+						<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+							<p:menuitem value="#{messages.idt}" outcome="idt" icon="ui-icon-locked" rendered="true" />
+						</sec:authorize>
+						<p:menuitem value="#{messages.pmpd_menu}" outcome="pmpd" />
+					</p:submenu>
+
+					<p:submenu label="#{messages.pronosticos}" icon="ui-icon-calculator" rendered="false">
+						<p:menuitem value="#{messages.rio_san_antonio}" outcome="pronosticos" />
+						<p:menuitem rendered="false" value="#{messages.otros_afluentes}" url="#" />
+						<p:menuitem rendered="false" value="#{messages.embalse_san_roque}" url="#" />
+					</p:submenu>
+
+
+					<p:submenu label="#{messages.configuracion}" icon="ui-icon-wrench">
+						<p:menuitem value="#{messages.notificaciones}" outcome="notificaciones" />
+						<p:menuitem value="#{messages.estaciones}" outcome="estaciones" />
+						<p:menuitem value="#{messages.vados_puentes}" outcome="vadosPuentes" />
+						<p:menuitem value="#{messages.cuencas}" outcome="cuencas" />
+						<p:menuitem value="#{messages.consulta_mantenimiento}" outcome="consultaMantenimiento" />
+
+						<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+							<p:menuitem value="#{messages.ecuaciones}" outcome="ecuaciones" icon="ui-icon-locked" iconPos="right" />
+							<p:menuitem value="#{messages.sensores_drenaje}" outcome="cuencasGisDrenaje" icon="ui-icon-locked" iconPos="right" />
+							<p:menuitem value="#{messages.usuarios}" outcome="usuarios" icon="ui-icon-locked" iconPos="right" />
+							
+
+						</sec:authorize>
+
+
+						<sec:authorize access="hasAnyRole('ADMIN')">
+							<p:menuitem value="#{messages.usuarios_logueados}" outcome="usuariosLogueados" icon="ui-icon-locked" iconPos="right" />
+							<p:menuitem value="#{messages.parametros_sistema}" outcome="parametros" icon="ui-icon-locked" iconPos="right" />
+						</sec:authorize>
+
+					</p:submenu>
+
+					<p:menuitem value="Mapas" outcome="mapas" rendered="false" />
+
+					<p:menuitem value="Log" outcome="log" rendered="true" icon="ui-icon-note" />
+
+					<p:submenu label="#{messages.ayuda}" icon="ui-icon-help" rendered="true">
+						<p:menuitem value="#{messages.acerca_de}" url="#" rendered="false" />
+						<p:menuitem value="#{messages.referencia}" outcome="referencia" rendered="true" />
+					</p:submenu>
+
+				</sec:authorize>
+
+				<f:facet name="options">
+
+					<h:outputLabel value="#{messages['usuario']}: " />
+					<p:spacer width="1" height="1" />
+					<h:outputLabel value="#{loginMBean.usuarioLogueado.username}" />
+					<p:spacer width="15" height="1" />
+
+					<h:outputLink value="#{request.contextPath}/j_spring_security_logout">
+						<h:outputLabel value="#{messages.salir}" />
+					</h:outputLink>
+					<p:spacer width="10" height="1" />
+
+
+				</f:facet>
+			</p:menubar>
+			<p:sticky target="menu" id="sMenu" />
+
+
+
+		</h:form>
+	</ui:composition>
+</body>
+</html>

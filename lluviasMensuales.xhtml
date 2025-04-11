@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+
+			<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+				<f:facet name="start">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+				</f:facet>
+
+				<f:facet name="complete">
+					<h:outputText value="" />
+				</f:facet>
+			</p:ajaxStatus>
+
+
+			<script type="text/javascript">
+				function start() {
+					PF('wvStatusDialog').show();
+				}
+
+				function stop() {
+					PF('wvStatusDialog').hide();
+				}
+			</script>
+
+			<h:form id="formSumarizadosMensuales">
+				<p:messages id="messages" showDetail="true" redisplay="true" closable="true" />
+
+
+				<p:fieldset legend="#{messages['lluvias_mensuales']}" style="padding:0.2em 1em;">
+
+
+
+
+					<p:panelGrid columns="1" style="width: 100%">
+
+
+						
+						<p:panelGrid columns="1" style="width: 100%">
+
+							<p:dataTable id="dtLluviasMensuales" var="sm" paginator="true" rows="50" lazy="false" value="#{sumarizadosMensualesMB.sumarizadosMensualesList}"
+								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" rowsPerPageTemplate="5,10,15,20,25,50,100,1000,10000"
+								stickyHeader="true" emptyMessage="No hay registros con el filtro aplicado">
+
+								<f:facet name="{Exporters}">
+									<h:commandLink style="vertical-align:middle;float:right;margin-right:1px" title="Exportar datos a excel">
+										<p:graphicImage value="/images/excel-icon.png" width="24" style="text-align:right" />
+										<p:dataExporter type="xls" target="dtLluviasMensuales" fileName="listadoLLuviasMensualesSPI" />
+									</h:commandLink>
+								</f:facet>
+
+
+								<p:column filterBy="#{sm.estacion}" filterMatchMode="exact" headerText="#{messages.estacion}" style="text-align:center;width:20%;">
+									<h:outputText value="#{sm.estacion}" />
+								</p:column>
+								<p:column filterBy="#{sm.anio}" filterMatchMode="exact" headerText="#{messages.anio}" style="text-align:center;width:20%;">
+									<h:outputText value="#{sm.anio}" />
+								</p:column>
+								<p:column filterBy="#{sm.mes}" filterMatchMode="exact" headerText="#{messages.mes}" style="text-align:center;width:20%;">
+									<h:outputText value="#{sm.mes}" />
+								</p:column>
+								<p:column headerText="#{messages.mm}" style="text-align:right;width:20%;">
+									<h:outputText value="#{sm.mm}" />
+								</p:column>
+
+								<p:column headerText="SPI" style="text-align:right;width:20%">
+									<h:outputText value="#{sm.spi!=null?sm.spi:' '}" />
+								</p:column>
+
+
+
+							</p:dataTable>
+						</p:panelGrid>
+					</p:panelGrid>
+
+				</p:fieldset>
+
+
+
+				<p:dialog modal="true" widgetVar="wvStatusDialog" header="#{messages.msj_espere}..." draggable="false" closable="false" resizable="false">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+				</p:dialog>
+
+
+
+			</h:form>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

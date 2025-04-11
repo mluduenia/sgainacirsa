@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+
+
+			<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+				<f:facet name="start">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+				</f:facet>
+
+				<f:facet name="complete">
+					<h:outputText value="" />
+				</f:facet>
+			</p:ajaxStatus>
+
+			<h:form id="formUsuarios">
+				<p:messages id="messages" showDetail="true" redisplay="true" closable="true" />
+
+				<p:fieldset legend="#{messages['usuarios']}" style="padding:0.2em 1em;">
+					<p:panel toggleable="true" header="Nuevo usuario..." style="vertical-align:top" collapsed="true" rendered="#{loginMBean.usuarioLogueado.rol eq 'ADMIN'}">
+						<p:panelGrid style="width: 100%;" columns="3" columnClasses="colGrid,colGrid,colGrid">
+
+							<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+								<h:panelGroup>
+									<h:outputLabel value="* " styleClass="requerido" />
+									<h:outputLabel for="nombre_usuario" value="#{messages.usuario}: " />
+								</h:panelGroup>
+								<p:inputText id="nombre_usuario" value="#{usuariosMB.oUsuarios.username}" />
+
+								<h:panelGroup>
+									<h:outputLabel value="* " styleClass="requerido" />
+									<h:outputLabel for="password" value="#{messages.password}: " />
+								</h:panelGroup>
+								<p:password id="password" value="#{usuariosMB.password}" label="#{messages.password}" />
+
+								<h:outputLabel for="email" value="#{messages.email}: " />
+								<p:inputText id="email" value="#{usuariosMB.oUsuarios.email}" label="#{messages.email}" />
+
+							</p:panelGrid>
+
+							<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+								<h:outputLabel for="nombre" value="#{messages.nombre}: " />
+								<p:inputText id="nombre" value="#{usuariosMB.oUsuarios.nombre}" label="#{messages.nombre}" />
+
+								<h:outputLabel for="apellido" value="#{messages.apellido}: " />
+								<p:inputText id="apellido" value="#{usuariosMB.oUsuarios.apellido}" label="#{messages.apellido}" />
+
+								<h:panelGroup>
+									<h:outputLabel value="* " styleClass="requerido" />
+									<h:outputLabel for="rol" value="#{messages.tipo}: " />
+								</h:panelGroup>
+								<h:selectOneMenu id="rol" value="#{usuariosMB.oUsuarios.rol}" label="#{messages.rol}">
+									<f:selectItem itemValue="OPERADOR" itemLabel="OPERADOR" />
+									<f:selectItem itemValue="SUPERVISOR" itemLabel="SUPERVISOR" />
+									<f:selectItem itemValue="ADMIN" itemLabel="ADMIN" />
+
+
+								</h:selectOneMenu>
+
+
+							</p:panelGrid>
+
+							<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+
+								<h:outputText value="#{messages.mail_monitoreo_ingreso_dw}" />
+								<h:selectBooleanCheckbox value="#{usuariosMB.oUsuarios.mailMonitoreoIngresoDw}" />
+
+								<h:outputText value="#{messages.mail_pronosticos_chequeo}" />
+								<h:selectBooleanCheckbox value="#{usuariosMB.oUsuarios.mailPronosticosChequeo}" />
+
+								<h:outputText value="#{messages.mail_pronosticos}" />
+								<h:selectBooleanCheckbox value="#{usuariosMB.oUsuarios.mailPronosticos}" />
+
+								<h:outputText value="#{messages.mail_calculo_amenazas}" />
+								<h:selectBooleanCheckbox value="#{usuariosMB.oUsuarios.mailCalculoAmenazas}" />
+
+								<h:outputText value="#{messages.mail_alta_tickets}" />
+								<h:selectBooleanCheckbox value="#{usuariosMB.oUsuarios.mailTickets}" />
+							</p:panelGrid>
+						</p:panelGrid>
+
+						<p:panelGrid style="width: 100%;text-align: right;" columns="1">
+							<p:commandButton value="#{messages.agregar_usuario}" action="#{usuariosMB.addUsuarios}" icon="ui-icon-plus" update="messages,formUsuarios,dtUsuarios" />
+						</p:panelGrid>
+
+					</p:panel>
+
+					<p:panelGrid columns="1" style="width: 100%;">
+
+						<p:dataTable id="dtUsuarios" var="usuario" value="#{usuariosMB.usuariosList}" paginator="true" rows="10" lazy="false" editable="true" scrollable="true" scrollWidth="100%" resizableColumns="true"
+							resizeMode="expand" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" rowsPerPageTemplate="5,10,15,20,25,50"
+							rowKey="#{usuario.id}">
+
+							<p:ajax event="rowEdit" listener="#{usuariosMB.onRowEdit}" update=":formUsuarios:messages" />
+							<p:ajax event="rowEditCancel" listener="#{usuariosMB.onRowCancel}" update=":formUsuarios:messages" />
+
+
+							<p:column rendered="false" headerText="#{messages.id}" sortBy="#{usuario.id}">
+								<h:outputText value="#{usuario.id}" />
+							</p:column>
+
+							<p:column headerText="#{messages.usuario}" sortBy="#{usuario.username}" style="width:5%">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{usuario.username}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{usuario.username}" label="#{messages.nombre_usuario}" maxlength="10" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="#{messages.nombre}" sortBy="#{usuario.nombre}" style="width:5%">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{usuario.nombre}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{usuario.nombre}" label="#{messages.nombre}" maxlength="100" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="#{messages.apellido}" sortBy="#{usuario.apellido}" style="width:5%">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{usuario.apellido}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{usuario.apellido}" label="#{messages.apellido}" maxlength="100" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+
+							<p:column headerText="#{messages.email}" sortBy="#{usuario.email}" style="width:7%">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{usuario.email}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{usuario.email}" label="#{messages.email}" maxlength="50" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="" style="width:5%;text-align:center" sortBy="#{usuario.mailMonitoreoIngresoDw}">
+								<f:facet name="header">
+									<h:outputText value="#{messages.mail_monitoreo_ingreso_dw_br}" title="#{messages.mail_monitoreo_ingreso_dw_title}" escape="false" />
+								</f:facet>
+
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:selectBooleanCheckbox value="#{usuario.mailMonitoreoIngresoDw}" disabled="true" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectBooleanCheckbox value="#{usuario.mailMonitoreoIngresoDw}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="" style="width:5%;text-align:center" sortBy="#{usuario.mailPronosticosChequeo}">
+								<f:facet name="header">
+									<h:outputText value="#{messages.mail_pronosticos_chequeo_br}" title="#{messages.mail_pronosticos_chequeo_title}" escape="false" />
+								</f:facet>
+
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:selectBooleanCheckbox value="#{usuario.mailPronosticosChequeo}" disabled="true" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectBooleanCheckbox value="#{usuario.mailPronosticosChequeo}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="" style="width:5%;text-align:center" sortBy="#{usuario.mailPronosticos}">
+								<f:facet name="header">
+									<h:outputText value="#{messages.mail_pronosticos_br}" title="#{messages.mail_pronosticos_title}" escape="false" />
+								</f:facet>
+
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:selectBooleanCheckbox value="#{usuario.mailPronosticos}" disabled="true" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectBooleanCheckbox value="#{usuario.mailPronosticos}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="" style="width:5%;text-align:center" sortBy="#{usuario.mailCalculoAmenazas}">
+								<f:facet name="header">
+									<h:outputText value="#{messages.mail_calculo_amenazas_br}" title="#{messages.mail_calculo_amenazas_title}" escape="false" />
+								</f:facet>
+
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:selectBooleanCheckbox value="#{usuario.mailCalculoAmenazas}" disabled="true" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectBooleanCheckbox value="#{usuario.mailCalculoAmenazas}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="" style="width:5%;text-align:center" sortBy="#{usuario.mailTickets}">
+								<f:facet name="header">
+									<h:outputText value="#{messages.mail_alta_tickets_br}" title="#{messages.mail_alta_tickets_title}" escape="false" />
+								</f:facet>
+
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:selectBooleanCheckbox value="#{usuario.mailTickets}" disabled="true" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectBooleanCheckbox value="#{usuario.mailTickets}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+
+							<p:column headerText="#{messages.ultimo_acceso_br}" sortBy="#{usuario.ultimoAcceso}" style="width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.ultimo_acceso_br}" escape="false" />
+								</f:facet>
+								<h:outputText value="#{usuario.ultimoAcceso}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+								</h:outputText>
+							</p:column>
+
+
+							<p:column headerText="#{messages.rol}" sortBy="#{usuario.rol}" style="width:5%">
+								<h:outputText value="#{usuario.rol}" rendered="#{loginMBean.usuarioLogueado.rol != 'ADMIN'}" />
+								<p:cellEditor rendered="#{loginMBean.usuarioLogueado.rol eq 'ADMIN'}">
+									<f:facet name="output">
+										<h:outputText value="#{usuario.rol}" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectOneMenu value="#{usuario.rol}" style="width:100%" label="#{messages.rol}">
+											<f:selectItem itemValue="OPERADOR" itemLabel="OPERADOR" />
+											<f:selectItem itemValue="SUPERVISOR" itemLabel="SUPERVISOR" />
+											<f:selectItem itemValue="ADMIN" itemLabel="ADMIN" />
+										</h:selectOneMenu>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+
+
+							<sec:authorize access="hasAnyRole('ADMIN')">
+								<p:column style="text-align:center;width:32px" headerText="Borrar">
+									<p:commandButton id="cmdBorrarUsuario" icon="ui-icon-trash" title="#{messages.borrar}" actionListener="#{usuariosMB.deleteUsuario(usuario)}"
+										update=":formUsuarios:messages,:formUsuarios:dtUsuarios">
+										<p:confirm header="Confirmación" message="¿Desea borrar el registro con id #{usuario.id}?" icon="ui-icon-alert" />
+									</p:commandButton>
+								</p:column>
+							</sec:authorize>
+
+							<p:column style="text-align:center; width:32px" headerText="Editar">
+								<p:rowEditor editTitle="#{messages.editar}" saveTitle="#{messages.guardar_cambios}" cancelTitle="#{messages.cancelar_edicion}"
+									rendered="#{loginMBean.usuarioLogueado.rol eq 'ADMIN' or usuario.username eq loginMBean.usuarioLogueado.username }" />
+							</p:column>
+
+							<p:column style="width:32px;text-align: center" headerText="Cambiar Clave...">
+								<f:facet name="header">
+									<h:outputText value="#{messages.cambiar_clave_br}" escape="false" />
+								</f:facet>
+								<p:commandButton rendered="#{loginMBean.usuarioLogueado.rol eq 'ADMIN' or usuario.username eq loginMBean.usuarioLogueado.username}"
+									update=":formUsuarios:passwordDetail,:formUsuarios:passwordDialog" action="#{usuariosMB.setPasswordDialogRendered(true)}" icon="ui-icon-squaresmall-plus" title="Cambiar clave...">
+									<f:setPropertyActionListener value="#{usuario}" target="#{usuariosMB.usuarioSelected}" />
+								</p:commandButton>
+							</p:column>
+
+
+
+
+						</p:dataTable>
+
+						<p:dialog id="passwordDialog" header="Cambiar Clave" widgetVar="wvPasswordDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false"
+							visible="#{usuariosMB.passwordDialogRendered}">
+							<p:outputPanel id="passwordDetail" style="text-align:right;">
+								<p:panelGrid columns="2" rendered="#{not empty usuariosMB.usuarioSelected}" columnClasses="label,value">
+									<h:outputLabel for="nombre_usuario_pwd" value="#{messages.nombre_usuario}: " />
+									<p:inputText id="nombre_usuario_pwd" disabled="true" value="#{usuariosMB.usuarioSelected.username}" />
+
+									<h:panelGroup rendered="false">
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel value="Clave actual: " />
+									</h:panelGroup>
+									<p:password rendered="false" id="idPwdChangeCurrent" value="#{usuariosMB.pwdChangeCurrent}" />
+
+
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel value="Nueva clave: " />
+									</h:panelGroup>
+									<p:password id="idPwdChangeNew" value="#{usuariosMB.pwdChangeNew}" />
+
+
+									<h:panelGroup>
+										<h:outputLabel value="* " styleClass="requerido" />
+										<h:outputLabel value="Repetir nueva clave: " />
+									</h:panelGroup>
+									<p:password id="idPwdChangeRepeatNew" value="#{usuariosMB.pwdChangeRepeatNew}" />
+
+								</p:panelGrid>
+
+								<p:panelGrid>
+									<p:messages id="msgPassword" showDetail="true" for="idPwdChangeNew" redisplay="true" />
+								</p:panelGrid>
+
+								<p:panelGrid style="width: 100%; text-align: right;" columns="1">
+									<h:panelGroup>
+										<p:commandButton value="#{messages.guardar}" action="#{usuariosMB.changePassword}" icon="ui-icon-check" update="passwordDialog,messages" />
+										<p:commandButton value="#{messages.cancelar}" action="#{usuariosMB.cancelChangePassword}" onclick="PF('wvPasswordDialog').hide()"
+											update=":formUsuarios:idPwdChangeNew,:formUsuarios:idPwdChangeRepeatNew" icon="ui-icon-close" />
+									</h:panelGroup>
+								</p:panelGrid>
+							</p:outputPanel>
+						</p:dialog>
+					</p:panelGrid>
+
+
+				</p:fieldset>
+
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+					<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+
+
+
+			</h:form>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

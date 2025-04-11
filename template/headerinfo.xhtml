@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+<body>
+	<ui:composition>
+
+		<h:form>
+
+			<p:menubar id="menu">
+				<p:menuitem icon="ui-icon-home" value="#{messages.inicio}" outcome="login" />
+
+
+				<p:submenu label="#{messages.mapas}" icon="ui-icon-document" rendered="false">
+					<p:menuitem value="#{messages.amenazas_calculadas}" outcome="mapaACuencas" />
+					<p:menuitem value="#{messages.lluvias_ultimas_24}" outcome="mapaEstaciones24" />
+					<p:menuitem value="#{messages.lluvias_ultimas_12}" outcome="mapaEstaciones12" />
+					<p:menuitem value="#{messages.lluvias_ultimas_6}" outcome="mapaEstaciones6" />
+					<p:menuitem value="#{messages.lluvias_ultimas_3}" outcome="mapaEstaciones3" />
+					<p:menuitem value="#{messages.lluvias_ultimas_1}" outcome="mapaEstaciones1" />
+				</p:submenu>
+
+				<p:menuitem icon="ui-icon-info" value="#{messages.consulta_amenazas}" outcome="alertas" />
+
+				<p:submenu label="#{messages.diseno_hidrologico}" icon="ui-icon-document" rendered="true">
+					<p:menuitem value="#{messages.pmpd_menu}" outcome="pmpd" />
+				</p:submenu>
+
+
+				<f:facet name="options">
+
+					<h:outputText value="#{messages.usuario}:  "></h:outputText>
+					<h:inputText id="userName" value="#{loginMBean.userName}" style="width:100px" tabindex="1"></h:inputText>
+					<p:spacer width="15" height="1" />
+					<h:outputText value="#{messages.clave}: "></h:outputText>
+					<p:spacer width="15" height="1" />
+					<h:inputSecret id="password" value="#{loginMBean.password}" style="width:100px" tabindex="2"></h:inputSecret>
+
+					<h:commandButton id="btnLoginId" value="#{messages.ingresar}" action="#{loginMBean.login}" styleClass="loginPanelBtn" tabindex="3"></h:commandButton>
+					<p:spacer width="40" height="1" />
+
+				</f:facet>
+
+
+
+			</p:menubar>
+			<p:sticky target="menu" />
+
+		</h:form>
+	</ui:composition>
+</body>
+</html>

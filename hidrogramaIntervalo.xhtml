@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+
+			<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+				<f:facet name="start">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+				</f:facet>
+
+				<f:facet name="complete">
+					<h:outputText value="" />
+				</f:facet>
+			</p:ajaxStatus>
+
+			<h:form id="formCharts">
+				<p:messages id="messages" showDetail="true" redisplay="true" closable="true" />
+
+				<p:fieldset legend="#{messages.hidrograma_intervalo_dias}">
+					<p:panelGrid id="panelFiltro" style="width:100%">
+
+						<p:row>
+
+							<p:column style="vertical-align:top;width:10%">
+								<h:outputLabel value="#{messages.fecha_desde}:" />
+								<p:calendar autocomplete="off" id="fechaDesde" value="#{hidrogramaIntervaloMB.filterdw.tTimeDesde}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm" showButtonPanel="true" />
+
+							</p:column>
+
+							<p:column style="vertical-align:top;width:10%">
+								<h:outputLabel value="#{messages.fecha_hasta}:" />
+								<p:calendar autocomplete="off" id="fechaHasta" value="#{hidrogramaIntervaloMB.filterdw.tTimeHasta}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm" showButtonPanel="true" />
+							</p:column>
+
+							<p:column rendered="true" style="vertical-align:top;width:10%">
+								<h:outputLabel value="#{messages.mostrar}   :" />
+								<p:selectOneMenu value="#{hidrogramaIntervaloMB.grafico}" style="width:100px">
+									<f:selectItem itemLabel="Caudal" itemValue="#{hidrogramaIntervaloMB.graficoCaudal}" />
+									<f:selectItem itemLabel="Volumen acumulado" itemValue="#{hidrogramaIntervaloMB.graficoVolumenAc}" />
+									<f:selectItem itemLabel="Nivel" itemValue="#{hidrogramaIntervaloMB.graficoDato}" />
+								</p:selectOneMenu>
+							</p:column>
+
+							<p:column rendered="true" style="vertical-align:top; width:10%">
+								<h:outputLabel value="#{messages.mostrar_puntos}:" />
+								<p:selectOneMenu value="#{hidrogramaIntervaloMB.mostrarPuntos}" style="width:100px">
+									<f:selectItem itemLabel="No" itemValue="false" />
+									<f:selectItem itemLabel="Sí" itemValue="true" />
+								</p:selectOneMenu>
+							</p:column>
+
+							<p:column style="vertical-align:top;width:60%">
+								<h:outputLabel value="#{messages.sensor}:" />
+								<p:selectManyCheckbox id="grid3" value="#{hidrogramaIntervaloMB.selectedEstaciones}" layout="grid" columns="3">
+									<f:selectItems value="#{hidrogramaIntervaloMB.siEstaciones}" />
+								</p:selectManyCheckbox>
+								<p:commandButton id="cmdSearch" ajax="true" value="#{messages.actualizar_grafico}" title="#{messages.actualizar_grafico}" actionListener="#{hidrogramaIntervaloMB.search}" icon="ui-icon-search"
+									update="chartNivel,messages" />
+								<p:commandButton rendered="false" ajax="true" value="#{messages.selecc_todos}" title="#{messages.seleccionar_todos_sensores}" actionListener="#{hidrogramaIntervaloMB.selectAll}"
+									icon="ui-icon-circle-check" update="grid3,messages" />
+								<p:commandButton rendered="false" ajax="true" value="#{messages.deselecc_todos}" title="#{messages.deseleccionar_todos_sensores}" actionListener="#{hidrogramaIntervaloMB.unselectAll}"
+									icon="ui-icon-circle-minus" update="grid3,messages" />
+							</p:column>
+
+
+
+
+
+						</p:row>
+
+
+					</p:panelGrid>
+
+
+					<p:chart id="chartNivel" widgetVar="wv_chart_nivel" type="line" model="#{hidrogramaIntervaloMB.dateModel}" style="height:400px;">
+
+					</p:chart>
+					<p:commandButton type="button" value="#{messages.exportar_grafico}" icon="ui-icon-extlink" onclick="exportChart()" />
+
+				</p:fieldset>
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+					<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+			</h:form>
+
+			<p:dialog widgetVar="dlg" showEffect="fade" width="100%" height="500px" modal="true" header="#{messages.imagen_grafico}" responsive="true" resizable="true" position="left top">
+				<p:outputPanel id="output" layout="block" />
+			</p:dialog>
+
+			<script type="text/javascript">
+				function exportChart() {
+					$('#output').empty().append(PF('wv_chart_nivel').exportAsImage());
+					PF('dlg').show();
+				}
+			</script>
+
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

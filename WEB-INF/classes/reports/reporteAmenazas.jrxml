@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.14.0.final using JasperReports Library version 6.14.0-2ab0d8625be255bf609c78e1181801213e51db8f  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="74ec41fd-b27f-45f4-9f36-b6b037934f2a">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="11"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Sample DB"/>
+	<style name="color_nivel">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{nivel}.trim().equals("NORMAL")]]></conditionExpression>
+			<style forecolor="#00FF00" backcolor="#00FF00"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{nivel}.trim().equals("ORDINARIO")]]></conditionExpression>
+			<style forecolor="#FFFF00" backcolor="#FFFF00"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{nivel}.trim().equals("MODERADO")]]></conditionExpression>
+			<style forecolor="#FFC800" backcolor="#FFC800"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{nivel}.trim().equals("ELEVADO")]]></conditionExpression>
+			<style forecolor="#FF0000" backcolor="#FF0000"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="idGeneracion" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="nombreReporte" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+a.id, a.fecha_alta, a.id_generacion, a.nivel, a.mm_promedio, a.cdad_estaciones_activas, a.cdad_estaciones_con_lluvia, a.cdad_estaciones,a.ultimas_x_horas_incluidas,c.id, c.nro, c.nombre,
+(SELECT  lpad (cast((EXTRACT(DAY from fecha_alta)) as varchar), 2, '0')  || '/' ||
+ lpad (cast((EXTRACT(MONTH from fecha_alta)) as varchar), 2, '0') || '/' ||
+ EXTRACT(YEAR from fecha_alta)  || '+' ||
+ lpad (cast((EXTRACT(HOUR from fecha_alta)) as varchar), 2, '0') || ':' ||
+ lpad (cast((EXTRACT(minute from fecha_alta)) as varchar), 2, '0')) as fecha_string
+from alertas a inner join cuencas c on c.id=a.id_cuenca
+where
+a.id_generacion=$P{idGeneracion}
+order by c.nro asc]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer"/>
+	<field name="fecha_alta" class="java.sql.Timestamp"/>
+	<field name="id_generacion" class="java.lang.Integer"/>
+	<field name="nivel" class="java.lang.String"/>
+	<field name="mm_promedio" class="java.lang.Double"/>
+	<field name="cdad_estaciones_activas" class="java.lang.Integer"/>
+	<field name="cdad_estaciones_con_lluvia" class="java.lang.Integer"/>
+	<field name="cdad_estaciones" class="java.lang.Integer"/>
+	<field name="ultimas_x_horas_incluidas" class="java.lang.Integer"/>
+	<field name="nro" class="java.lang.Integer"/>
+	<field name="nombre" class="java.lang.String"/>
+	<field name="fecha_string" class="java.lang.String"/>
+	<variable name="color_nivel" class="java.lang.String"/>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="109">
+			<frame>
+				<reportElement mode="Opaque" x="-20" y="-20" width="595" height="92" backcolor="#006699" uuid="c1123c98-95f1-42ee-b9fa-bef5daa08a67"/>
+				<staticText>
+					<reportElement x="11" y="5" width="367" height="25" forecolor="#FFFFFF" uuid="94e58891-1961-489d-a371-8ce3417981c5"/>
+					<textElement>
+						<font size="18" isBold="true"/>
+					</textElement>
+					<text><![CDATA[REPORTE DE NIVELES DE AMENAZA]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="16" y="52" width="155" height="20" forecolor="#FFFFFF" uuid="4fefa3db-6610-4787-b094-412d86a6e8d0"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Fecha/Hora generación:]]></text>
+				</staticText>
+				<textField pattern="dd/MM/yyyy HH:mm">
+					<reportElement mode="Transparent" x="174" y="52" width="139" height="20" forecolor="#FFFFFF" backcolor="#FFFFFF" uuid="e524440f-5773-463f-9de4-4113b73b7170"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="SansSerif" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{fecha_alta}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="15" y="32" width="173" height="20" forecolor="#FFFFFF" uuid="7f33f3f4-87ed-4de9-87c5-42466d48f660"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="false"/>
+					</textElement>
+					<text><![CDATA[En base a generación nro.:]]></text>
+				</staticText>
+				<textField>
+					<reportElement mode="Transparent" x="190" y="32" width="146" height="20" forecolor="#FFFFFF" backcolor="#FFFFFF" uuid="fde4480a-7f73-468d-b405-70d4c57d0f3b"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="SansSerif" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{idGeneracion}]]></textFieldExpression>
+				</textField>
+				<image scaleImage="FillFrame">
+					<reportElement x="420" y="10" width="139" height="75" uuid="c0264504-04ce-4549-bd8f-4b15be435fd6"/>
+					<imageExpression><![CDATA["https://sgainacirsa.ddns.net/cirsa/images/LOGO1.png"]]></imageExpression>
+				</image>
+				<textField>
+					<reportElement mode="Transparent" x="16" y="70" width="386" height="20" forecolor="#FFFFFF" backcolor="#FFFFFF" uuid="c997e4ee-904b-498e-bf5f-c411220e504a"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="SansSerif" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{nombreReporte}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<staticText>
+				<reportElement mode="Opaque" x="5" y="75" width="180" height="20" forecolor="#006699" backcolor="#FFFFFF" uuid="7bc9d227-1023-4b81-8d94-f6f7192711c9"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ Cuenca/Zona/Región]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="212" y="75" width="70" height="20" forecolor="#006699" backcolor="#FFFFFF" uuid="a5f85e63-01e8-4b97-8159-ec38481614fc"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nivel]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="280" y="75" width="102" height="28" forecolor="#006699" backcolor="#FFFFFF" uuid="e9e6e7b6-3cca-4ac3-a7a1-b8ef061fa5a0"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Media lluvias [mm]]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="450" y="75" width="105" height="29" forecolor="#006699" backcolor="#FFFFFF" uuid="b40d8a1e-1974-424d-adeb-6ef8443df1a3"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Est. con lluvia / activas / total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="380" y="75" width="61" height="32" forecolor="#006699" backcolor="#FFFFFF" uuid="c5c4ecbd-da1a-4234-b3c4-b97f4aed51bc"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ventana [h]]]></text>
+			</staticText>
+			<line>
+				<reportElement x="-22" y="105" width="595" height="1" forecolor="#666666" uuid="66eea748-5c6d-4e4e-b7ab-9531bcc998ef"/>
+			</line>
+		</band>
+	</title>
+	<columnHeader>
+		<band/>
+	</columnHeader>
+	<detail>
+		<band height="23">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="19" width="555" height="1" uuid="a51ef0c9-eb1c-4ab6-a7f6-2b800d61d1cc"/>
+			</line>
+			<textField>
+				<reportElement x="5" y="1" width="27" height="20" uuid="4ddfd7af-c87e-4f64-9aba-5d2871482b4f"/>
+				<textFieldExpression><![CDATA[$F{nro}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="26" y="1" width="186" height="20" uuid="8621fb59-a5b2-43a9-94d4-7fdc001bda69"/>
+				<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="color_nivel" x="204" y="1" width="100" height="20" uuid="73e99e2d-9626-46fe-bb1f-f950125a2f53"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{nivel}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="458" y="0" width="89" height="20" uuid="d0ca5ab1-536e-4509-8c82-521e5c3939fc"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{cdad_estaciones_con_lluvia}+"/"+$F{cdad_estaciones_activas}+"/"+$F{cdad_estaciones}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="276" y="0" width="100" height="20" uuid="2528d5f8-8142-47bb-9bb0-62ff8ef8a71f"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{mm_promedio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="404" y="1" width="26" height="20" uuid="f85805dd-a3ca-476a-9a66-bd6ebed11a06"/>
+				<textFieldExpression><![CDATA[$F{ultimas_x_horas_incluidas}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<lastPageFooter>
+		<band height="761">
+			<staticText>
+				<reportElement mode="Transparent" x="11" y="606" width="536" height="136" forecolor="#000000" backcolor="#FFFFFF" uuid="24928446-3b05-47fc-a6e8-9072374c4712"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[(*) INA-CIRSA opera y administra el Sistema de Adquisición de Datos a Tiempo Real en un esfuerzo por mejorar la calidad de la información meteorológica para el acceso público a la misma a fin de su empleo en los sistemas de Alerta Temprana de Lluvias, en base al Convenio Marco suscripto con el Ministerio de Gobierno de la Provincia de Córdoba bajo protocolo INA N° 1376.
+
+Los datos son generados por estaciones de tecnología ALERT instaladas en campo, cuyo complejo proceso de adquisición y transferencia de los mismos puede en ocasiones sufrir interferencias externas (colisión de datos, vandalismo, meteoros como rayos, viento, granizo y otros) que afectan su calidad.
+
+El INA-CIRSA no brinda garantía expresa o implícita sobre las mediciones y exactitud de los valores, razón por lo cual los datos deben ser considerados como referenciales y sujetos a revisión.
+
+De igual manera no se responsabiliza sobre la utilización de los mismos en los Sistemas de Alerta Temprana de Lluvia.]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yy HH:mm">
+				<reportElement x="445" y="744" width="100" height="13" uuid="07d7417d-5154-496b-9d4f-d1d33d7f26e2"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<image scaleImage="FillFrame">
+				<reportElement x="115" y="15" width="343" height="571" uuid="b04e1baf-30c7-4fcc-8875-8d624ebabcbf"/>
+				<imageExpression><![CDATA["https://sgainacirsa.ddns.net/geoserver/wspCirsa/wms?service=WMS&version=1.1.0&request=GetMap&layers=wspCirsa:lgAmenazasCuencas&viewparams=p_fecha:" + $F{fecha_string} + "&styles=&bbox=-65.22233333,-33.4149076854835,-63.74858569,-30.877908674364&width=687&height=1152&srs=EPSG:4326&format=image%2Fjpeg"]]></imageExpression>
+			</image>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

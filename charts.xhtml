@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+
+
+
+			<h:form id="formCharts">
+				<p:messages id="messages" showDetail="true" redisplay="true" closable="true" />
+				<p:poll id="poll_update" widgetVar="wv_poll_autoupdate" interval="300" listener="#{chartsMB.reload}" update="fecha,chartNivel,messages" />
+
+				<p:panelGrid columns="2" style="width: 100%; text-align:left">
+					<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+						<f:facet name="start">
+							<h:graphicImage value="/images/ajaxloadingbar.gif" />
+						</f:facet>
+						<f:facet name="complete">
+							<h:outputText value="" />
+						</f:facet>
+					</p:ajaxStatus>
+
+					<p:panelGrid columns="1" style="width: 100%; text-align:right">
+						<p:selectBooleanCheckbox styleClass="booleanCheckbox" itemLabel="#{messages.actualizar_automaticamente}" value="#{chartsMB.actualizar}">
+							<p:ajax listener="#{chartsMB.setAutoUpdate}" update="messages" />
+						</p:selectBooleanCheckbox>
+					</p:panelGrid>
+				</p:panelGrid>
+
+				<p:fieldset legend="#{messages.limnigrama_dia_sensor}">
+					<p:panelGrid id="panelFiltro" style="width:100%">
+
+						<p:row>
+
+							<p:column style="vertical-align:top;">
+								<h:outputLabel value="#{messages.dia}:" />
+								<p:calendar id="fecha" value="#{chartsMB.filterdw.tTime}" mode="inline" pattern="dd/MM/yyyy" locale="#{loginMBean.locale}">
+									<p:ajax event="dateSelect" listener="#{chartsMB.search}" update="chartNivel,messages" />
+								</p:calendar>
+							</p:column>
+
+
+							<p:column style="vertical-align:top;">
+								<h:outputLabel value="#{messages.sensor}:" />
+								<p:selectManyCheckbox id="grid3" value="#{chartsMB.selectedEstaciones}" layout="grid" columns="3">
+									<!-- 	<p:ajax listener="#{chartsMB.search}" update="chartNivel,messages" /> -->
+									<f:selectItems value="#{chartsMB.siEstaciones}" var="car" itemLabel="#{car}" itemValue="#{car}" />
+								</p:selectManyCheckbox>
+								<p:commandButton id="cmdSearch" ajax="true" value="#{messages.actualizar_limnigrama}" actionListener="#{chartsMB.search}" icon="ui-icon-search" update="chartNivel,messages" />
+								<p:commandButton ajax="true" value="#{messages.seleccionar_todos_sensores}" actionListener="#{chartsMB.selectAll}" icon="ui-icon-circle-check" update="grid3,messages" />
+								<p:commandButton ajax="true" value="#{messages.deseleccionar_todos_sensores}" actionListener="#{chartsMB.unselectAll}" icon="ui-icon-circle-minus" update="grid3,messages" />
+							</p:column>
+
+
+
+
+
+						</p:row>
+
+					</p:panelGrid>
+
+					<p:chart id="chartNivel" widgetVar="wv_chart_nivel" type="line" model="#{chartsMB.dateModel}" style="height:400px;">
+					</p:chart>
+					<p:commandButton type="button" value="#{messages.exportar_grafico}" icon="ui-icon-extlink" onclick="exportChart()" />
+
+				</p:fieldset>
+			</h:form>
+
+			<p:dialog widgetVar="dlg" showEffect="fade" width="100%" height="500px" modal="true" header="#{messages.imagen_grafico}" responsive="true" resizable="true" position="left top">
+				<p:outputPanel id="output" layout="block" />
+			</p:dialog>
+
+			<script type="text/javascript">
+				function exportChart() {
+					$('#output').empty().append(PF('wv_chart_nivel').exportAsImage());
+					PF('dlg').show();
+				}
+			</script>
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

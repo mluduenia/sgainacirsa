@@ -1,0 +1,96 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+
+	<ui:composition>
+
+		<p:panelGrid columns="3" style="width: 100%;" styleClass="colReferencias">
+			<p:panelGrid columns="1" style="width: 100%; padding:0px;">
+				<h:panelGroup>
+					<h:outputText value="#{messages.referencias_amenazas}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="width:10px;height:10px;background-color:rgba(255,0,15,0.5);" />
+					<h:outputText value="#{messages.nivel_elevado}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="width:10px;height:10px;background-color:rgba(250,107,0,0.5);" />
+					<h:outputText value="#{messages.nivel_moderado}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="width:10px;height:10px;background-color:rgba(244,224,0,0.5);" />
+					<h:outputText value="#{messages.nivel_ordinario}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="width:10px;height:10px;background-color:rgba(26,165,64,0.5);" />
+					<h:outputText value="#{messages.nivel_normal}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color:grey;width:10px;height:10px" />
+					<h:outputText value="#{messages.sin_datos}" />
+				</h:panelGroup>
+			</p:panelGrid>
+
+			<p:panelGrid columns="1" style="width: 100%; padding:0px;">
+				<h:panelGroup>
+					<h:outputText value="#{messages.referencias_estaciones}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color: #ff000f;width:4px;height:4px;background: blue; border-radius: 50%;" />
+					<h:outputText value="#{messages.referencia_estacion_lluvia}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color: #ff000f;width:4px;height:4px" />
+					<h:outputText value="#{messages.referencia_nivel_elevado}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color: #fa6b00;width:4px;height:4px" />
+					<h:outputText value="#{messages.referencia_nivel_moderado}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color: #f4e000;width:4px;height:4px" />
+					<h:outputText value="#{messages.referencia_nivel_ordinario}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color:#1aa540;width:4px;height:4px" />
+					<h:outputText value="#{messages.referencia_nivel_normal}" />
+				</h:panelGroup>
+			</p:panelGrid>
+
+			<p:panelGrid columns="1" style="width: 100%; padding:0px;">
+				<h:panelGroup>
+					<h:outputText value="#{messages.referencia_radar_th}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color: #ff00ba;width:4px;height:4px" />
+					<h:outputText value="#{messages.referencia_radar_65}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color: #ff000f;width:4px;height:4px" />
+					<h:outputText value="#{messages.referencia_radar_55}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color: #fa6b00;width:4px;height:4px" />
+					<h:outputText value="#{messages.referencia_radar_45}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color: #f4e000;width:4px;height:4px" />
+					<h:outputText value="#{messages.referencia_radar_35}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color: #1aa540;width:4px;height:4px" />
+					<h:outputText value="#{messages.referencia_radar_25}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:inputText readonly="true" style="background-color: #36d96d;width:4px;height:4px" />
+					<h:outputText value="#{messages.referencia_radar_15}" />
+				</h:panelGroup>
+			</p:panelGrid>
+		</p:panelGrid>
+
+	</ui:composition>
+
+</h:body>
+
+</html>

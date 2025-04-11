@@ -1,0 +1,232 @@
+.ui-panelgrid {
+	border-collapse: separate;
+}
+
+.ui-panelgrid .ui-panelgrid-cell {
+	border-style: none;
+	padding: 2px 5px;
+}
+
+.alignTop2Col {
+	vertical-align: top;
+	width: 30%;
+}
+.alignTop2Col50 {
+	vertical-align: top;
+	width: 50%;
+}
+
+.alignTop2Col40 {
+	vertical-align: top;
+	width: 40%;
+}
+
+.alignTop2Col60 {
+	vertical-align: top;
+	width: 60%;
+}
+
+.alignTopCol20 {
+	vertical-align: top;
+	width: 20%;
+}
+
+.alignTop2Col70 {
+	vertical-align: top;
+	width: 70%;
+}
+
+.alignTop90 {
+	vertical-align: top;
+	width: 90%;
+}
+.alignTop10 {
+	vertical-align: top;
+	width: 10%;
+}
+.topAlign {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.stepColor.green {
+	color: green;
+}
+
+.stepColor.red {
+	color: red;
+}
+
+.stepColor.blue {
+	color: blue;
+}
+
+.stepColor.black {
+	color: black;
+}
+
+.backColor.black {
+	background-color: #c4c4c4 ;
+}
+
+.CON_LLUVIA {
+	background-color: #99FFFF;
+}
+
+td .nivel {
+	text-align: center;
+}
+
+.nivel.ELEVADO {
+	background-color: red;
+}
+
+.nivel.MODERADO {
+	background-color: orange;
+}
+
+.nivel.ORDINARIO {
+	background-color: yellow;
+}
+
+.nivel.NORMAL {
+	background-color: green;
+}
+
+.resumen.precip{
+	background-color: #99FFCC;
+}
+
+.resumen.clases{
+	background-color: #FFFF66;
+}
+
+.requerido {
+	color: red;
+}
+
+.colGrid {
+	vertical-align: top;
+}
+
+.colLabel {
+	text-align: right;
+}
+
+.colValue {
+	text-align: left;
+}
+.colTitulo{
+	font-weight: bold;
+	line-height: 20px;  
+	font-size: 18px;
+}
+.colFecha{
+	text-align:right;
+	
+}
+
+
+.logo {
+	overflow: hidden;
+}
+
+div.fill-screen {
+	/*  position: fixed;*/
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	margin-left: 30%;
+	margin-top: 5%;
+}
+
+img.make-it-fit {
+	max-width: 60%;
+	max-height: 60%;
+}
+
+.ui-clock_menu {
+	float: right;
+	width: 180px;
+	margin-right: 25px;
+}
+
+.mmInput {
+	width: 80px;
+}
+
+.estacion {
+	width: 200px;
+	display: inline-block;
+}
+
+.codigo {
+	width: 50px;
+	display: inline-block;
+}
+
+.cuenca {
+	vertical-align: top;
+}
+
+body .booleanCheckbox.ui-chkbox {
+	width: auto;
+}
+
+body .booleanCheckbox .ui-chkbox-box {
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 4px;
+}
+
+body .booleanCheckbox .ui-chkbox-label {
+	vertical-align: middle;
+	margin-top: 0;
+}
+
+._50{
+    width:46%;
+    display:inline;
+    float:left;
+    margin-left:2%;
+    margin-right:2%
+}
+/**/
+div.fill {
+	width: 100%;
+	height: 100%;
+}
+
+.radar-info {
+	padding: 0px;
+}
+
+#logos {
+	position: absolute;
+	z-index: 100000;
+	left: .5em;
+	top: 5em;
+	display: none;
+}
+
+#frmMapa\:pRadar .ui-panelgrid-cell {
+	padding: 0px 0px !important;
+}
+
+.colReferencias td {
+	vertical-align: top;
+	font-size: 15px;
+}
+
+.escala {
+	color: #4f4f4f;
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+}
+
+#frmMapa\:pDisclaimer .ui-panelgrid-cell {
+	font-size: 14px;
+}
+
+

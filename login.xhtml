@@ -1,0 +1,229 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+
+	<ui:composition template="template/templateinfo.xhtml">
+
+
+		<ui:define name="content">
+
+
+
+
+
+			<h:form id="frmMapa">
+
+				<p:messages id="messages" showDetail="true" />
+
+				<p:poll id="poll_update" interval="300" listener="#{mapsLoaderMB.reset}" oncomplete="reloadMaps()" update="stringDate" global="false" />
+
+
+				<p:carousel value="#{notificacionesMB.notificacionesVigentes}" headerText="#{messages.notificaciones}" var="notificacion" itemStyle="border:0px;text-align:left;">
+					<p:panelGrid columns="1" style="width:100%;margin:10px 0px;text-align:left;" styleClass="ui-panelgrid-blank">
+						<f:facet name="header">
+							<p:graphicImage value="/images/#{notificacion.informa}.png" width="40" height="40" />
+							<h:outputText value=" #{notificacion.titulo}" />
+						</f:facet>
+						<h:outputText value="#{notificacion.mensaje}" style="text-align:left" />
+						<h:panelGroup>
+							<h:outputLabel value="#{messages.fecha_emision}:" style="text-align:left" />
+							<h:outputLabel value="#{notificacion.fechaAlta}">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+							</h:outputLabel>
+						</h:panelGroup>
+					</p:panelGrid>
+
+				</p:carousel>
+
+				<p:panelGrid columns="1" style="width: 100%; ">
+					<p:selectOneRadio widgetVar="wvLayers" id="sorLayer" value="#{mapsLoaderMB.selectedLayer}" onchange="reloadMaps();" style="width: 100%">
+						<f:selectItem itemValue="amenazas" itemLabel="#{messages.niveles_amenaza}" />
+						<f:selectItem itemValue="24" itemLabel="#{messages.lluvias_ultimas_24_short}" />
+						<f:selectItem itemValue="12" itemLabel="#{messages.lluvias_ultimas_12_short}" />
+						<f:selectItem itemValue="6" itemLabel="#{messages.lluvias_ultimas_6_short}" />
+						<f:selectItem itemValue="3" itemLabel="#{messages.lluvias_ultimas_3_short}" />
+						<f:selectItem itemValue="1" itemLabel="#{messages.lluvias_ultimas_1_short}" />
+					</p:selectOneRadio>
+				</p:panelGrid>
+
+				<p:panelGrid columns="3" style="width: 100%;padding:0px;font-size: 14px">
+					<p:panelGrid columns="1" style="width: 100%; text-align:left;">
+						<h:panelGroup>
+							<h:graphicImage rendered="true" value="images/SD_ICON.png" height="15" />
+							<h:outputLabel value="#{messages.su_geolocalizacion}" />
+
+						</h:panelGroup>
+					</p:panelGrid>
+
+					<p:panelGrid id="panelFecha" columns="1" style="width: 100%;text-align: left">
+						<h:panelGroup>
+							<h:outputLabel value="#{messages.fecha_hora_refresh}: " />
+							<h:inputText id="stringDate" readonly="true" value="#{mapsLoaderMB.refreshDate}" style="width:120px">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+							</h:inputText>
+							<h:outputLabel value=" #{messages.mensaje_mapa_actualizado5}" style="width: 100%;" />
+						</h:panelGroup>
+					</p:panelGrid>
+					<p:panelGrid id="pRadar" columns="3" style="width: 20%;text-align:right; padding:0px;border-spacing: 0px">
+
+						<p:selectBooleanCheckbox id="chRadar" widgetVar="wvChRadar" style="display:block;width:250px;float:right;padding:0px;text-align:right" itemLabel="#{messages.radar_cba}" value="false"
+							onchange="changesLayerVisibility();" />
+
+						<h:outputText id="infofecha" style="display:block;width:120px;float:left;padding:0px;text-align:left" readonly="true">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+						</h:outputText>
+
+						<h:outputText style="display:block;width:150px;float:left;padding:0px;text-align:left" id="infohoras">(Úlimas 3h.)</h:outputText>
+					</p:panelGrid>
+				</p:panelGrid>
+
+				<h:panelGrid columns="1" style="font-size: 12px;padding-left:15px;padding-top:0px;">
+					<h:panelGroup>
+						<p:outputLabel id="info" value="" />
+					</h:panelGroup>
+				</h:panelGrid>
+
+
+				<!-- MAP  -->
+				<div id="map" class="map" style="height: 900px"></div>
+				<div id="scale" class="escala"></div>
+
+
+
+				<ui:include src="/leyendas1.xhtml" />
+
+				<p:spacer height="10" />
+
+				<p:panelGrid columns="1" id="pDisclaimer">
+					<h:outputText value="#{messages.disclaimer2}" escape="false" />
+				</p:panelGrid>
+
+			</h:form>
+
+
+			<p:dialog id="dStatus" modal="true" widgetVar="wvStatusDialog" header="#{messages.msj_espere}..." draggable="false" closable="false" resizable="false">
+				<h:graphicImage value="images/ajaxloadingbar.gif" />
+			</p:dialog>
+
+			<p:dialog id="dError" modal="true" widgetVar="wvErrorDialog" header="#{messages.title_fallo_conexion}" draggable="false" closable="true" resizable="false">
+				<h:outputText value="#{messages.msg_error_consulta}" />
+			</p:dialog>
+
+			<script src="js/moment.min.js" type="text/javascript"></script>
+			<script src="js/moment-round.js" type="text/javascript"></script>
+
+
+			<script src="mapas/ol.js" type="text/javascript"></script>
+			<script src="mapas/mapaLogin.js?v=11" type="text/javascript"></script>
+
+
+			<script type="text/javascript">
+				//<![CDATA[
+				function changesLayerVisibility() {
+					radarLayer.setVisible(PrimeFaces.widgets["wvChRadar"].input.is(':checked'));
+					javascript: $('#logos').toggle();
+					if (radarLayer.getVisible() == true) {
+						reloadRadar()
+					} else {
+						document.getElementById('frmMapa:infofecha').innerHTML = '';
+						document.getElementById('frmMapa:infohoras').innerHTML = '';
+						stop();
+
+					}
+
+				}
+
+				function reloadRadar() {
+					var layerSelected = PF('wvLayers').getJQ().find(':checked').val();
+					if (PF('wvChRadar').isChecked()) {
+						if (layerSelected == 'amenazas') {
+							document.getElementById('frmMapa:infohoras').innerHTML = "(Últimas 6hs.)";
+							changeStartDate(6);
+						} else {
+							if (layerSelected == 1) {
+								document.getElementById('frmMapa:infohoras').innerHTML = "(Última hora)";
+							} else {
+								document.getElementById('frmMapa:infohoras').innerHTML = "(Últimas " + layerSelected + "hs.)";
+							}
+							changeStartDate(layerSelected);
+
+						}
+					}
+				}
+				function reloadMaps() {
+
+					document.getElementById('frmMapa:infofecha').value = '';
+
+					var layerSelected = PF('wvLayers').getJQ().find(':checked').val();
+					var viewparams = [ 'p_force_refresh:' + Date.now() ];
+
+					if (layerSelected == 'amenazas') {
+						sourceEstaciones = new ol.source.ImageWMS({
+							ratio : 1,
+							url : wmsLocation,
+							params : {
+								'FORMAT' : format,
+								'VERSION' : '1.1.1',
+								viewparams : viewparams,
+								LAYERS : 'wspCirsa:sgaViewEstaciones',
+								STYLES : ''
+							}
+						})
+						sourceCuencas = new ol.source.ImageWMS({
+							ratio : 1,
+							url : wmsLocation,
+							params : {
+								'FORMAT' : format,
+								'VERSION' : '1.1.1',
+								viewparams : viewparams,
+								LAYERS : 'wspCirsa:sgaViewAlertasCuencas',
+								STYLES : '',
+							}
+						})
+
+						estacionesLayer.setSource(sourceEstaciones);
+						cuencasLayer.setSource(sourceCuencas);
+
+					} else {
+						cuencasLayer.setSource(null);
+						sourceLLuvia = new ol.source.ImageWMS({
+							ratio : 1,
+							url : wmsLocation,
+							params : {
+								'FORMAT' : format,
+								viewparams : 'p_ventana:' + layerSelected,
+								'VERSION' : '1.1.1',
+								LAYERS : 'wspCirsa:sgaViewDWData24h',
+								STYLES : '',
+							}
+						});
+						estacionesLayer.setSource(sourceLLuvia);
+
+					}
+
+					sourceDrenaje = new ol.source.ImageWMS({
+						ratio : 1,
+						url : wmsLocation,
+						params : {
+							'FORMAT' : format,
+							'VERSION' : '1.1.1',
+							viewparams : viewparams,
+							LAYERS : 'wspCirsa:sgaViewSADrenaje',
+							STYLES : '',
+						}
+					});
+					drenajeLayer.setSource(sourceDrenaje);
+					reloadRadar();
+				}
+
+				//]]>
+			</script>
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

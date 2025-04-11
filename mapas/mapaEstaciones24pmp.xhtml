@@ -1,0 +1,86 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+
+	<ui:composition template="#{empty request.remoteUser?'../template/templateinfo.xhtml':'../template/template.xhtml'}">
+		<ui:define name="content">
+
+			<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdR06M2wq1XRh73M-egCkmnuD3Vzw91SU" type="text/javascript" />
+
+			<h:form id="frmMapa">
+
+				<br />
+
+				<p:fieldset legend="#{messages.lluvias_ultimas_24_pmp}">
+
+					<p:panelGrid id="panelFecha" columns="1" style="width: 100%; text-align:right">
+						<h:outputLabel value="#{messages.seleccionar_fecha_hora}:" />
+						<p:calendar id="idCalendarSelection" value="#{mapsLoaderMB.selectedDate}" pattern="dd/MM/yyyy HH:mm" showButtonPanel="true" widgetVar="wvCalendarSelection" locale="#{loginMBean.locale}">
+							<p:ajax event="dateSelect" oncomplete="reloadMaps()" />
+						</p:calendar>
+					</p:panelGrid>
+
+					<!-- MAP -->
+					<div id="map" style="height: 900px">
+						<div id="gmap" class="fill"></div>
+						<div id="olmap" class="fill"></div>
+					</div>
+					<div id="wrapper">
+						<div id="location" style="float: right"></div>
+						<div id="scale" class="escala"></div>
+					</div>
+
+					<p:panelGrid columns="2" style="width: 100%; ">
+
+						<h:panelGroup>
+							<h:outputLabel value="#{messages.referencias}:" />
+							<p:panelGrid columns="1" style="width: 100%; text-align:left">
+								<h:graphicImage rendered="true"
+									value="#{messages.wms}?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=wspCirsa%3AsgaViewDWData24h&amp;scale=700000&amp;transparent=false&amp;LEGEND_OPTIONS=forceRule:True;borderColor:0000ff;border:true;fontSize:16;font-family:Arial" />
+							</p:panelGrid>
+						</h:panelGroup>
+
+
+					</p:panelGrid>
+
+					<p:panelGrid id="pDisclaimer" columns="1" style="width: 100%;">
+						<h:outputText value="#{messages.disclaimer}" escape="false" />
+					</p:panelGrid>
+
+					<p:panelGrid columns="1" style="width: 100%; text-align:right">
+						<h:graphicImage rendered="true" value="/images/logo.png" />
+					</p:panelGrid>
+
+				</p:fieldset>
+			</h:form>
+
+			<script src="ol.js" type="text/javascript"></script>
+			<script src="mapaEstaciones24pmp.js" type="text/javascript"></script>
+
+			<script type="text/javascript">
+				function reloadMaps() {
+					var pDateSelected = document.getElementById('frmMapa:idCalendarSelection_input').value;
+
+					// mapa 1 hora
+					var viewparams = [ 'p_ventana:24', 'p_fecha:' + pDateSelected ];
+					var source = untiled.getSource();
+					var params = source.getParams();
+					params.viewparams = viewparams.join(';');
+					source.updateParams(params);
+
+					var viewparamsDrenaje = [ 'p_fecha:' + pDateSelected ];
+					var sourceDrenaje = untiledDrenaje.getSource();
+					var paramsDrenaje = sourceDrenaje.getParams();
+					paramsDrenaje.viewparams = viewparamsDrenaje;
+					sourceDrenaje.updateParams(paramsDrenaje);
+
+				}
+			</script>
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+
+
+	<ui:composition template="#{empty request.remoteUser?'template/templateinfo.xhtml':'template/template.xhtml'}">
+
+		<ui:define name="content">
+			
+			<h:form id="formAlertas">
+				<p:messages id="messages" showDetail="true" />
+
+				<p:poll id="poll_update" widgetVar="wv_poll_autoupdate" interval="300" listener="#{alertasMB.reload}" update="messages,dtAlertas" />
+				
+					<p:panelGrid columns="2" style="width: 100%;">
+					<p:panelGrid columns="1" style="width: 100%; text-align:left">
+						<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+							<f:facet name="start">
+								<h:graphicImage value="/images/ajaxloadingbar.gif" title="#{messages.actualizando}" />
+							</f:facet>
+							<f:facet name="complete">
+								<h:outputText value="" />
+							</f:facet>
+						</p:ajaxStatus>
+					</p:panelGrid>
+					<p:panelGrid columns="1" style="width: 100%; text-align:right">
+						<p:selectBooleanCheckbox styleClass="booleanCheckbox" itemLabel="#{messages.actualizar_automaticamente}" value="#{alertasMB.actualizar}">
+							<p:ajax listener="#{alertasMB.setAutoUpdate}" update="messages" />
+						</p:selectBooleanCheckbox>
+					</p:panelGrid>
+				</p:panelGrid>
+				
+				<p:fieldset legend="#{messages.amenazas_calculadas}" style="padding:0.2em 1em">
+
+				
+
+					<p:panelGrid columns="1" style="width: 90%;">
+						<h:panelGroup>
+
+
+							<!-- generar con datos del dw -->
+							<sec:authorize access="isAuthenticated()">
+								<p:commandButton rendered="true" id="cmdGenerarAlertas" ajax="true" value="#{messages.generar_alertas} (datos DW)" actionListener="#{alertasMB.generateAlertasDW}" icon="ui-icon-search"
+									update=":formAlertas,:formAlertas:messages,dtAlertas" />
+
+							</sec:authorize>
+
+						</h:panelGroup>
+					</p:panelGrid>
+
+					<p:panelGrid id="panelAlertasConsulta" style="width:70%">
+
+						<p:row>
+							<p:column rendered="true">
+								<h:outputLabel value="#{messages.id_generacion}:" />
+								<p:inputText title="#{messages.id_generacion}" value="#{alertasMB.alertasFilter.idGeneracion}" style="width:80px" />
+							</p:column>
+
+							<p:column rendered="false">
+								<h:outputLabel value="#{messages.id_alerta}:" />
+								<p:inputText title="#{messages.id_alerta}" value="#{alertasMB.alertasFilter.id}" style="width:80px" />
+							</p:column>
+
+							<p:column>
+								<h:outputLabel value="#{messages.fecha_desde}:" />
+								<p:calendar id="fechaDesde" label="fecha desde" value="#{alertasMB.alertasFilter.fechaDesde}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm" showButtonPanel="true"
+									locale="#{loginMBean.locale}" />
+							</p:column>
+
+							<p:column>
+								<h:outputLabel value="#{messages.fecha_hasta}:" />
+								<p:calendar id="fechaHasta" label="fecha hasta" value="#{alertasMB.alertasFilter.fechaHasta}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm" showButtonPanel="true"
+									locale="#{loginMBean.locale}" />
+							</p:column>
+
+							<p:column>
+								<h:outputText value="#{messages.cuenca}:" />
+								<p:selectOneMenu id="selCuencas" value="#{alertasMB.alertasFilter.idCuenca}" style="width:200px">
+									<f:selectItem itemLabel="SELECCIONE" itemValue="" />
+									<f:selectItems value="#{alertasMB.siCuencas}" />
+								</p:selectOneMenu>
+							</p:column>
+
+						</p:row>
+					</p:panelGrid>
+
+
+					<br />
+
+					<p:panelGrid columns="1" style="width: 100%;">
+						<h:panelGroup>
+							<p:commandButton id="cmdSearch" value="#{messages.buscar}" actionListener="#{alertasMB.search}" icon="ui-icon-search" update=":formAlertas:messages,:formAlertas:dtAlertas" />
+
+							<p:commandButton id="cmdCancelFilter" ajax="true" value="#{messages.limpiar_filtros}" actionListener="#{alertasMB.cancelSearchFilter}" icon="ui-icon-refresh"
+								update="formAlertas:panelAlertasConsulta,:formAlertas:messages,dtAlertas" />
+
+							<h:outputLabel value="#{messages.en_base_nro_gen}:" />
+							<p:inputText title="#{messages.id_generacion}" value="#{alertasMB.alertasFilter.idGeneracionParamReporte}" style="width:80px" />
+							<h:commandButton rendered="true" id="cmdGenerarReporte" ajax="true" value="#{messages.ver_reporte} (pdf)"
+								actionListener="#{reportsMB.crearReporte(alertasMB.alertasFilter.idGeneracionParamReporte)}" icon="ui-icon-document" update=":formAlertas:messages" />
+
+						</h:panelGroup>
+
+						<p:dataTable id="dtAlertas" var="alerta" value="#{alertasMB.lazyDataModel}" paginator="true" rows="20" lazy="true" scrollable="true" style="width:100%" scrollWidth="100%" resizeMode="expand"
+							resizableColumns="true" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" rowsPerPageTemplate="5,10,15,18,20,25,50"
+							rowKey="#{alerta.id}">
+
+							<p:column headerText="#{messages.id_generacion}" resizable="true" sortBy="#{alerta.idGeneracion}">
+								<f:facet name="header">
+									<h:outputText value="#{messages.id_generacion}" title="#{messages.id_generacion_title}" />
+								</f:facet>
+								<h:outputText value="#{alerta.idGeneracion}" />
+							</p:column>
+
+
+							<p:column rendered="false" headerText="#{messages.id_alerta}" sortBy="#{alerta.id}">
+								<h:outputText value="#{alerta.id}" />
+							</p:column>
+
+							<p:column rendered="false" headerText="#{messages.nro_cuenca}" sortBy="#{alerta.cuencas.nro}">
+								<h:outputText value="#{alerta.cuencas.nro}" />
+							</p:column>
+
+
+							<p:column headerText="#{messages.cuenca}" sortBy="#{alerta.cuencas.nro}" style="width:20%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.cuenca}" title="#{messages.cuenca}" />
+								</f:facet>
+								<h:outputText value="#{alerta.cuencas.nro}-#{alerta.cuencas.nombre}" />
+							</p:column>
+
+							<p:column style="text-align:center;width:15%" headerText="#{messages.fecha}" sortBy="#{alerta.fechaAlta}">
+								<f:facet name="header">
+									<h:outputText value="#{messages.fecha}" title="#{messages.fecha_hora_generacion}" />
+								</f:facet>
+								<h:outputText value="#{alerta.fechaAlta}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+								</h:outputText>
+							</p:column>
+							<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+								<p:column headerText="#{messages.mm_nivel_alerta_ordinario}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.mm_nivel_alerta_ordinario_br}" title="#{messages.mm_nivel_alerta_ordinario}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{alerta.cuencas.mmAlertaOrdinario}" />
+								</p:column>
+
+								<p:column style="text-align:right;width:5%">
+									<f:facet name="header">
+										<h:outputText value="#{messages.mm_nivel_alerta_moderado_br}" title="#{messages.mm_nivel_alerta_moderado}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{alerta.cuencas.mmAlertaModerado}" />
+								</p:column>
+
+								<p:column headerText="#{messages.mm_nivel_alerta_elevado}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.mm_nivel_alerta_elevado_br}" title="#{messages.mm_nivel_alerta_elevado}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{alerta.cuencas.mmAlertaElevado}" />
+								</p:column>
+							</sec:authorize>
+
+							<p:column headerText="#{messages.nivel_alerta}" sortBy="#{alerta.nivel}" styleClass="nivel #{alerta.nivel}" style="text-align:center">
+								<f:facet name="header">
+									<h:outputText value="#{messages.nivel_alerta_br}" title="#{messages.nivel_alerta}" escape="false" />
+								</f:facet>
+								<f:facet name="header">
+									<h:outputText value="#{messages.nivel_alerta}" title="#{messages.nivel_alerta}" />
+								</f:facet>
+								<h:outputText value="#{alerta.nivel}" />
+							</p:column>
+
+							<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+								<p:column headerText="#{messages.sumatoria}" style="text-align:right" sortBy="#{alerta.mmSumatoria}">
+									<f:facet name="header">
+										<h:outputText value="#{messages.sumatoria_br}" title="#{messages.sumatoria}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{alerta.mmSumatoria}" />
+								</p:column>
+							</sec:authorize>
+
+							<p:column headerText="" style="text-align:right" sortBy="#{alerta.mmPromedio}">
+								<f:facet name="header">
+									<h:outputText value="#{messages.promedio}" title="#{messages.promedio}" escape="false" />
+								</f:facet>
+								<h:outputText value="#{alerta.mmPromedio}" />
+							</p:column>
+
+
+							<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+								<p:column headerText="#{messages.sumatoria_area_mm}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.sumatoria_area_mm_br}" title="#{messages.sumatoria_area_mm}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{alerta.sumatoriaAreaXMm}" />
+								</p:column>
+								<p:column headerText="#{messages.sumatoria_area}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.sumatoria_area_br}" title="#{messages.sumatoria_area}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{alerta.sumatoriaArea}" />
+								</p:column>
+								<p:column headerText="#{messages.promedio_ponderado}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.promedio_ponderado_br}" title="#{messages.promedio_ponderado}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{alerta.mmPromedioPonderado}" />
+								</p:column>
+							</sec:authorize>
+
+							<p:column rendered="true" headerText="" style="text-align:right">
+								<f:facet name="header">
+									<h:outputText value="#{messages.cdad_estaciones_lluvia_activas_total_br}" title="#{messages.cdad_estaciones_lluvia_activas_total}" escape="false" />
+								</f:facet>
+								<h:outputText value="#{alerta.cdadEstacionesConLluvia}/#{alerta.cdadEstacionesActivas}/#{alerta.cdadEstaciones}" />
+							</p:column>
+
+
+							<p:column headerText="#{messages.ventana_alerta}" style="text-align:right">
+								<f:facet name="header">
+									<h:outputText value="#{messages.ventana_alerta_br}" title="#{messages.ventana_alerta}" escape="false" />
+								</f:facet>
+								<h:outputText value="#{alerta.ultimasXHorasIncluidas}" />
+							</p:column>
+
+							<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+								<p:column style="text-align:center">
+
+									<p:commandButton id="cmdBorrarAlerta" icon="ui-icon-trash" actionListener="#{alertasMB.deleteAlerta(alerta)}" title="#{messages.borrar}" update=":formAlertas:messages,dtAlertas">
+										<p:confirm header="#{messages.confirmacion}" message="#{messages.confirmacion_borrar_alertas}  #{alerta.idGeneracion}" icon="ui-icon-alert" />
+									</p:commandButton>
+
+								</p:column>
+							</sec:authorize>
+						</p:dataTable>
+					</p:panelGrid>
+
+				</p:fieldset>
+
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+					<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+
+			</h:form>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

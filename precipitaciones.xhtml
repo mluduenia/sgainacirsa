@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+
+	<ui:composition template="template/template.xhtml">
+
+	
+		<ui:define name="content">
+
+			<h:form id="formPrecipitaciones">
+				<p:poll id="poll_autoupdate" widgetVar="wv_poll_autoupdate" interval="60" listener="#{precipitacionesMB.reload}"
+					update=":formPrecipitaciones:messages,:formPrecipitaciones:tabViewPrecipitaciones:dtCargasPrecipitaciones,:formPrecipitaciones:tabViewPrecipitaciones:dtSumatoria" />
+				<p:messages id="messages" showDetail="true" escape="false" />
+
+				<p:panelGrid columns="2" style="width: 100%; text-align:left">
+					<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+						<f:facet name="start">
+							<h:graphicImage value="/images/ajaxloadingbar.gif" />
+						</f:facet>
+						<f:facet name="complete">
+							<h:outputText value="" />
+						</f:facet>
+					</p:ajaxStatus>
+					<p:panelGrid columns="1" style="width: 100%; text-align:right">
+						<p:selectBooleanCheckbox styleClass="booleanCheckbox" itemLabel="#{messages.actualizar_automaticamente1}" value="#{precipitacionesMB.actualizar}">
+							<p:ajax listener="#{precipitacionesMB.setAutoUpdate}" update=":formPrecipitaciones:messages" />
+						</p:selectBooleanCheckbox>
+					</p:panelGrid>
+				</p:panelGrid>
+
+				<p:tabView id="tabViewPrecipitaciones">
+
+					<p:tab title="#{messages.datos_dw}" id="tabConsulta">
+						<p:panelGrid id="panelFiltro" style="width:100%" >
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="#{messages.fecha_desde}:" />
+								</p:column>
+
+								<p:column>
+									<h:outputLabel value="#{messages.fecha_hasta}:" />
+								</p:column>
+
+								<p:column>
+									<h:outputLabel value="#{messages.estacion}:" />
+								</p:column>
+
+
+								<p:column>
+									<h:outputLabel value="#{messages.tipo_valor}:" />
+								</p:column>
+
+								<p:column>
+									<h:outputLabel value="#{messages.mantenimiento}:" />
+								</p:column>
+
+								<p:column>
+									<h:outputLabel value="#{messages.valor_mayor_a}:" />
+								</p:column>
+
+
+
+
+
+							</p:row>
+
+							<p:row>
+								<p:column>
+									<p:calendar autocomplete="off" id="fechaDesde" value="#{precipitacionesMB.filterdw.tTimeDesde}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm" showButtonPanel="true" />
+								</p:column>
+
+								<p:column>
+									<p:calendar id="fechaHasta" value="#{precipitacionesMB.filterdw.tTimeHasta}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm" showButtonPanel="true" />
+								</p:column>
+
+								<p:column>
+									<p:selectOneMenu id="selEstaciones" value="#{precipitacionesMB.idEstacion}" filter="true" filterMatchMode="contains" style="width:100px">
+										<f:selectItem itemLabel="TODAS" itemValue="" />
+										<f:selectItem itemLabel="SOLO ESTACIONES DE LLUVIA" itemValue="-1" />
+										<f:selectItem itemLabel="SOLO ESTACIONES DE NIVEL" itemValue="-2" />
+										<f:selectItems value="#{precipitacionesMB.siEstaciones}" />
+									</p:selectOneMenu>
+								</p:column>
+
+
+								<p:column>
+									<p:selectOneMenu id="tipoValor" value="#{precipitacionesMB.filterdw.valido}" style="width:100px">
+										<f:selectItem itemLabel="TODOS" itemValue="#{null}" />
+										<f:selectItem itemLabel="SOLO VÁLIDOS" itemValue="#{true}" />
+										<f:selectItem itemLabel="SOLO INVÁLIDOS" itemValue="#{false}" />
+									</p:selectOneMenu>
+								</p:column>
+
+								<p:column>
+									<p:selectOneMenu id="enMantenimiento" value="#{precipitacionesMB.filterdw.enMantenimiento}" style="width:100px">
+										<f:selectItem itemLabel="TODOS" itemValue="#{null}" />
+										<f:selectItem itemLabel="SOLO EN MANTENIMIENTO" itemValue="#{true}" />
+										<f:selectItem itemLabel="SOLO NO EN MANTENIMIENTO" itemValue="#{false}" />
+									</p:selectOneMenu>
+								</p:column>
+								<p:column>
+									<h:inputText value="#{precipitacionesMB.filterdw.tData}" style="width:100px" />
+								</p:column>
+
+
+
+
+
+							</p:row>
+
+
+						</p:panelGrid>
+
+						<p:panelGrid columns="1" style="width: 100%;">
+
+							<h:panelGroup>
+								<p:commandButton id="cmdSearch" ajax="true" value="#{messages.buscar}" actionListener="#{precipitacionesMB.search}" icon="ui-icon-search"
+									update=":formPrecipitaciones:messages,:formPrecipitaciones:tabViewPrecipitaciones:dtCargasPrecipitaciones" />
+
+								<p:commandButton id="cmdCancelFilter" ajax="true" value="#{messages.limpiar_filtros}" actionListener="#{precipitacionesMB.cancelSearchFilter}" icon="ui-icon-refresh"
+									update=":formPrecipitaciones:messages,:formPrecipitaciones:tabViewPrecipitaciones:dtCargasPrecipitaciones,panelFiltro" />
+
+							</h:panelGroup>
+							<p:remoteCommand name="onCellEdit" update="dtCargasPrecipitaciones" />
+							<p:dataTable id="dtCargasPrecipitaciones" var="dt" value="#{precipitacionesMB.lazyDataModel}" paginator="true" rows="25" lazy="true" scrollable="true" scrollWidth="100%" resizableColumns="true"
+								resizeMode="expand" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}"
+								rowsPerPageTemplate="5,10,15,20,25,50,100,500">
+
+								<f:facet name="{Exporters}">
+									<h:commandLink style="vertical-align:middle;float:right;margin-right:1px" title="Exportar datos a excel">
+										<p:graphicImage value="/images/excel-icon.png" width="24" style="text-align:right" />
+										<p:dataExporter type="xls" target="dtCargasPrecipitaciones" fileName="data" postProcessor="#{precipitacionesMB.postProcessXLS}" />
+									</h:commandLink>
+								</f:facet>
+
+								<p:ajax event="rowEdit" listener="#{precipitacionesMB.onRowEditDW}" update=":formPrecipitaciones:messages" oncomplete="onCellEdit()" />
+								<p:ajax event="rowEditCancel" listener="#{precipitacionesMB.onRowCancel}" update=":formPrecipitaciones:messages" />
+
+								<p:column headerText="Id" rendered="true" style="text-align:right;width:5%;">
+									<h:outputText value="#{dt.id}" />
+								</p:column>
+
+
+
+								<p:column headerText="#{messages.fecha_hora}">
+									<h:outputText value="#{dt.tTime}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+									</h:outputText>
+								</p:column>
+
+
+
+								<p:column headerText="#{messages.estacion}" style="text-align:right">
+									<h:outputText value="#{dt.sensor}" />
+								</p:column>
+
+
+								<p:column headerText="#{messages.tipo}" style="text-align:right;width:5%;">
+									<h:outputText value="#{dt.tipo}" />
+								</p:column>
+
+								<p:column rendered="false" headerText="#{messages.valor} contador o nivel" style="text-align:right">
+									<p:cellEditor>
+										<f:facet name="input">
+											<h:inputText value="#{dt.tData}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:inputText>
+										</f:facet>
+										<f:facet name="output">
+											<h:outputText value="#{dt.tData}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+
+								<p:column headerText="" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.valor_contador_nivel}" title="#{messages.valor_contador_nivel}" escape="false" />
+									</f:facet>
+
+
+									<h:outputText value="#{dt.tData}" styleClass="stepColor #{dt.stepColor}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+
+								<p:column headerText="" style="width:15%;text-align:center">
+									<f:facet name="header">
+										<h:outputText value="#{messages.valor_contador_nivel_valido}" title="#{messages.valor_contador_nivel_valido}" escape="false" />
+									</f:facet>
+
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:selectBooleanCheckbox value="#{dt.valido}" disabled="true" />
+										</f:facet>
+										<f:facet name="input">
+											<h:selectBooleanCheckbox value="#{dt.valido}" label="Válido" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+
+									<p:column style="text-align:center; width:32px">
+										<p:commandButton icon="ui-icon-check" title="#{dt.valido?'Setear como valor NO válido':'Setear como valor válido'}" actionListener="#{precipitacionesMB.changeValido(dt)}"
+											update=":formPrecipitaciones:messages,:formPrecipitaciones:tabViewPrecipitaciones:dtCargasPrecipitaciones" />
+									</p:column>
+
+
+								</sec:authorize>
+
+								<p:column headerText="#{messages.cantidad}" style="text-align:right" styleClass="stepColor #{dt.stepColor}">
+									<h:outputText value="INVÁLIDO " rendered="#{not dt.valido}" />
+									<h:outputText value="#{dt.step}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+									<h:outputText value="#{dt.unidad}" />
+
+								</p:column>
+
+
+								<p:column headerText="" style="width:15%;text-align:center">
+									<f:facet name="header">
+										<h:outputText value="#{messages.mantenimiento_excluir}" title="#{messages.mantenimiento_excluir}" escape="false" />
+									</f:facet>
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:selectBooleanCheckbox value="#{dt.enMantenimiento}" disabled="true" />
+										</f:facet>
+										<f:facet name="input">
+											<h:selectBooleanCheckbox value="#{dt.enMantenimiento}" label="En mantenimiento" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<!-- 
+								<p:column headerText="#{messages.unidad}">
+									<h:outputText value="#{dt.unidad}" />
+								</p:column>
+
+ -->
+
+								<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+
+									<p:column style="text-align:center; width:45px" headerText="#{messages.editar}" rendered="false">
+										<p:rowEditor editTitle="#{messages.editar}" saveTitle="#{messages.guardar_cambios}" cancelTitle="#{messages.cancelar_edicion}" />
+									</p:column>
+
+
+									<p:column style="text-align:center; width:32px">
+										<p:commandButton icon="ui-icon-wrench"
+											title="#{dt.enMantenimiento?'Setear como valor transmitido con estación fuera de mantenimiento / incluír en cálculos':'Setear como valor transmitido con estación en mantenimiento / excluír de cálculos'}"
+											actionListener="#{precipitacionesMB.changeEnMantenimiento(dt)}" update=":formPrecipitaciones:messages,:formPrecipitaciones:tabViewPrecipitaciones:dtCargasPrecipitaciones" />
+									</p:column>
+
+
+
+
+								</sec:authorize>
+
+							</p:dataTable>
+
+
+
+						</p:panelGrid>
+
+
+					</p:tab>
+
+
+					<p:tab title="#{messages.consulta_sumarizacion_estacion}" id="tabConsultaSumatoria" rendered="true">
+
+						<p:panelGrid id="panelFiltroSumatoria" style="width:50%">
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="#{messages.fecha_desde}:" />
+									<p:calendar locale="#{loginMBean.locale}" id="fechaDesdeSum" value="#{precipitacionesMB.filterdwSumPorSensor.tTimeDesde}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm"
+										showButtonPanel="true" />
+								</p:column>
+
+								<p:column>
+									<h:outputLabel value="#{messages.fecha_hasta}:" />
+									<p:calendar locale="#{loginMBean.locale}" id="fechaHastaSum" value="#{precipitacionesMB.filterdwSumPorSensor.tTimeHasta}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm"
+										showButtonPanel="true" />
+								</p:column>
+
+								<p:column rendered="false">
+									<h:outputLabel value="#{messages.valor_mayor_a}:" />
+									<p:inputText id="valorSum" maxlength="5" style="width:100px" value="#{precipitacionesMB.filterdwSumPorSensor.tData}" label="Valor" />
+								</p:column>
+
+							</p:row>
+
+
+						</p:panelGrid>
+
+						<p:panelGrid columns="1" style="width: 50%;">
+
+							<h:panelGroup>
+								<p:commandButton id="cmdSearchSumatoria" ajax="true" value="#{messages.buscar}" actionListener="#{precipitacionesMB.searchSumatoria}" icon="ui-icon-search"
+									update=":formPrecipitaciones:messages,:formPrecipitaciones:tabViewPrecipitaciones:dtSumatoria" />
+
+								<p:commandButton id="cmdCancelFilterSumatoria" ajax="true" value="#{messages.limpiar_filtros}" actionListener="#{precipitacionesMB.cancelSearchFilterSumatoria}" icon="ui-icon-refresh"
+									update=":formPrecipitaciones:messages,:formPrecipitaciones:tabViewPrecipitaciones:panelFiltroSumatoria" />
+
+							</h:panelGroup>
+
+
+
+							<p:dataTable id="dtSumatoria" var="dt" value="#{precipitacionesMB.sumarizadosList}" paginator="true" rows="100" lazy="false" editable="false" style="margin-bottom:20px"
+								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" rowsPerPageTemplate="5,10,15,20,25,50,100,500">
+
+								<f:facet name="{Exporters}">
+									<h:commandLink style="vertical-align:middle;float:right;margin-right:1px" title="Exportar datos a excel">
+										<p:graphicImage value="/images/excel-icon.png" width="24" style="text-align:right" />
+										<p:dataExporter type="xls" target="dtSumatoria" fileName="data" />
+									</h:commandLink>
+								</f:facet>
+
+
+
+								<p:column headerText="Estación" style="text-align:right">
+									<h:outputText value="#{dt.sensor}" />
+								</p:column>
+
+
+								<p:column headerText="#{messages.valor} [mm]" style="text-align:right">
+									<h:outputText value="#{dt.step}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+							</p:dataTable>
+
+
+
+						</p:panelGrid>
+
+
+					</p:tab>
+				</p:tabView>
+
+
+
+
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+					<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+
+			</h:form>
+
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

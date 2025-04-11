@@ -1,0 +1,368 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+
+
+	<ui:composition template="#{empty request.remoteUser?'../template/templateinfo.xhtml':'../template/template.xhtml'}">
+		<ui:define name="content">
+
+
+			<style type="text/css">
+.column {
+	float: left;
+}
+</style>
+
+
+
+			<script src="../js/jspdf.min.js" type="text/javascript"></script>
+			<script src="../js/ol.js" type="text/javascript"></script>
+			<script src="../js/olms.js" type="text/javascript"></script>
+
+
+			<link href="#{facesContext.externalContext.requestContextPath}/resources/ol6.css" rel="styleSheet" type="text/css" />
+
+			<h:form id="frmMapa">
+				<p:messages id="messages" showDetail="true" />
+
+				<br />
+				<p:fieldset legend="#{messages.pmpd}">
+
+
+
+
+
+
+					<p:panelGrid columns="2" style="width: 100%;" columnClasses="alignTop2Col60,alignTop2Col40">
+
+						<p:panelGrid columns="1" style="width: 100%;">
+							<!-- MAP  -->
+							<div id="map" class="map" style="height: 600px"></div>
+
+							<div id="wrapper" class="escala">
+								<div id="location" style="float: right"></div>
+								<div id="scale"></div>
+								<div id="nodelist">Haga click en un punto para obtener su valor</div>
+								<div id="estaciones"></div>
+							</div>
+
+
+
+
+							<p:panelGrid columns="1" style="width: 100%; text-align:left">
+								<h:graphicImage rendered="true" id="layerLegend"
+									value="#{messages.wmsLabs}?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=wspCirsaLabs%3APMD2&amp;transparent=false&amp;LEGEND_OPTIONS=forceRule:True;borderColor:0000ff;border:true;fontSize:16;font-family:Arial" />
+							</p:panelGrid>
+
+						</p:panelGrid>
+
+
+						<p:panelGrid style="width: 100%; text-align:left" id="pgParametros">
+
+
+
+
+							<p:row>
+								<p:column colspan="2">
+									<h:outputLabel value="#{messages.msg_uso_pmd}" />
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:spacer height="20"></p:spacer>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<h:outputLabel value="#{messages.latitud}:" />
+								</p:column>
+								<p:column>
+									<p:inputText id="it_lat" value="#{pmpdMB.lat}" label="#{messages.latitud}" />
+
+								</p:column>
+							</p:row>
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="#{messages.longitud}:" />
+								</p:column>
+								<p:column>
+									<p:inputText id="it_lon" value="#{pmpdMB.lon}" label="#{messages.longitud}" />
+									<p:commandButton action="#{pmpdMB.updateValue}" icon="ui-icon-search" title="#{messages.actualizar_valores_punto}" update="messages" />
+
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:spacer height="20"></p:spacer>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<h:outputLabel value="#{messages.mostrar_capa}:" />
+								</p:column>
+								<p:column>
+									<p:selectOneMenu id="sel_capa" widgetVar="wv_sel_capa" style="vertical-align:middle" value="#{pmpdMB.capa}" onchange="reloadMaps(value)">
+										<f:selectItem itemLabel="PMD 2 años" itemValue="PMD2" />
+										<f:selectItem itemLabel="PMD 5 años" itemValue="PMD5" />
+										<f:selectItem itemLabel="PMD 10 años" itemValue="PMD10" />
+										<f:selectItem itemLabel="PMD 25 años" itemValue="PMD25" />
+										<f:selectItem itemLabel="PMD 50 años" itemValue="PMD50" />
+										<f:selectItem itemLabel="PMD 100 años" itemValue="PMD100" />
+										<f:selectItem itemLabel="VLEP 24 hs" itemValue="PMP24h" />
+										<f:selectItem itemLabel="VLEP 1 día" itemValue="PMP1D" />
+										<f:selectItem itemLabel="Capa agrupada PMD/VLEP" itemValue="agrupadas" />
+									</p:selectOneMenu>
+								</p:column>
+							</p:row>
+
+							<p:row>
+								<p:column>
+									<p:spacer height="20"></p:spacer>
+								</p:column>
+							</p:row>
+
+							<p:row>
+								<p:column colspan="2">
+									<h:outputLabel value="#{messages.valor_punto_agrupada}:" />
+								</p:column>
+							</p:row>
+
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="PMD 2 años:" />
+								</p:column>
+								<p:column>
+									<p:inputText id="it_valor_pmd2" value="#{pmpdMB.pmd2}" readonly="true" style="width:60px" />
+								</p:column>
+							</p:row>
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="PMD 5 años:" />
+								</p:column>
+								<p:column>
+									<p:inputText id="it_valor_pmd5" value="#{pmpdMB.pmd5}" readonly="true" style="width:60px" />
+								</p:column>
+							</p:row>
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="PMD 10 años:" />
+								</p:column>
+								<p:column>
+									<p:inputText id="it_valor_pmd10" value="#{pmpdMB.pmd10}" readonly="true" style="width:60px" />
+								</p:column>
+							</p:row>
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="PMD 25 años:" />
+								</p:column>
+								<p:column>
+									<p:inputText id="it_valor_pmd25" value="#{pmpdMB.pmd25}" readonly="true" style="width:60px" />
+								</p:column>
+							</p:row>
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="PMD 50 años:" />
+								</p:column>
+								<p:column>
+									<p:inputText id="it_valor_pmd50" value="#{pmpdMB.pmd50}" readonly="true" style="width:60px" />
+								</p:column>
+							</p:row>
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="PMD 100 años:" />
+								</p:column>
+								<p:column>
+									<p:inputText id="it_valor_pmd100" value="#{pmpdMB.pmd100}" readonly="true" style="width:60px" />
+								</p:column>
+							</p:row>
+
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="VLEP 24hs:" />
+								</p:column>
+								<p:column>
+									<p:inputText id="it_valor_pmp24" value="#{pmpdMB.pmp24}" readonly="true" style="width:60px" />
+								</p:column>
+							</p:row>
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="VLEP 1d:" />
+								</p:column>
+								<p:column>
+									<p:inputText id="it_valor_pmp1d" value="#{pmpdMB.pmp1d}" readonly="true" style="width:60px" />
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column colspan="2">
+									<p:commandButton id="export-pdf" value="#{messages.descargar_en_pdf}" />
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+
+					</p:panelGrid>
+
+					<p:panelGrid columns="1" style="width: 100%;" rendered="#{not empty request.remoteUser}">
+
+						<h:outputLabel value="#{messages.valores_pmpd_estaciones}:" />
+
+						<p:dataTable id="dtEstaciones" var="estacion" value="#{pmpdMB.estacionesList}" paginator="true" rows="10" lazy="false" editable="false" scrollable="true" scrollWidth="100%"
+							resizableColumns="true" resizeMode="expand" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}"
+							rowsPerPageTemplate="5,10,15,20,25,50,100" rowKey="#{estacion.id}" widgetVar="estacionesTable">
+
+							<f:facet name="{Exporters}">
+								<h:commandLink style="vertical-align:middle;float:right;margin-right:1px" title="Exportar datos a excel">
+									<p:graphicImage value="/images/excel-icon.png" width="24" style="text-align:right" />
+									<p:dataExporter type="xls" target="dtEstaciones" fileName="listadoEstaciones" />
+								</h:commandLink>
+							</f:facet>
+
+							<p:column headerText="#{messages.codigo}" sortBy="#{estacion.codigo}" style="width:5%" filterable="true" filterBy="#{estacion.codigo}" footerText="Igual a" filterMatchMode="exact">
+								<h:outputText value="#{estacion.codigo}" />
+							</p:column>
+
+							<p:column headerText="#{messages.nombre}" sortBy="#{estacion.nombre}" style="width:10%" filterBy="#{estacion.nombre}" footerText="Contiene" filterMatchMode="contains">
+								<h:outputText value="#{estacion.nombre}" title="#{estacion.nombre}" />
+							</p:column>
+
+							<p:column headerText="#{messages.latitud}" sortBy="#{estacion.latitude}" style="width:5%" rendered="true">
+								<h:outputText value="#{estacion.latitude}" title="#{estacion.latitude}" />
+							</p:column>
+
+							<p:column headerText="#{messages.longitud}" sortBy="#{estacion.longitude}" style="width:5%" rendered="true">
+								<h:outputText value="#{estacion.longitude}" title="#{estacion.longitude}" />
+							</p:column>
+
+							<p:column headerText="#{messages.msnm}" sortBy="#{estacion.msnm}" style="width:5%;text-align:right" rendered="true">
+								<h:outputText value="#{estacion.msnm}" title="#{estacion.msnm}" />
+							</p:column>
+
+							<p:column sortBy="#{estacion.pmd2a}" style="width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.pmd_sigla_2_br}" escape="false" />
+								</f:facet>
+								<h:outputText value="#{estacion.pmd2a}" />
+							</p:column>
+
+							<p:column sortBy="#{estacion.pmd10a}" style="width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.pmd_sigla_5_br}" escape="false" />
+								</f:facet>
+								<h:outputText value="#{estacion.pmd5a}" />
+							</p:column>
+
+							<p:column sortBy="#{estacion.pmp}" style="width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.pmd_sigla_10_br}" escape="false" />
+								</f:facet>
+								<h:outputText value="#{estacion.pmd10a}" />
+							</p:column>
+
+							<p:column sortBy="#{estacion.pmd25a}" style="width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.pmd_sigla_25_br}" escape="false" />
+								</f:facet>
+								<h:outputText value="#{estacion.pmd25a}" />
+							</p:column>
+
+							<p:column sortBy="#{estacion.pmd50a}" style="width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.pmd_sigla_50_br}" escape="false" />
+								</f:facet>
+								<h:outputText value="#{estacion.pmd50a}" />
+							</p:column>
+
+							<p:column sortBy="#{estacion.pmd100a}" style="width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.pmd_sigla_100_br}" escape="false" />
+								</f:facet>
+								<h:outputText value="#{estacion.pmd100a}" />
+							</p:column>
+
+							<p:column sortBy="#{estacion.pmp}" style="width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.pmp_sigla_24hs_br}" escape="false" />
+								</f:facet>
+								<h:outputText value="#{estacion.pmp}" />
+							</p:column>
+
+							<p:column sortBy="#{estacion.pmp1d}" style="width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{messages.pmp_sigla_dia_br}" escape="false" />
+								</f:facet>
+
+								<h:outputText value="#{estacion.pmp1d}" />
+							</p:column>
+
+
+
+
+							<p:column style="width:5%" rendered="true">
+								<f:facet name="header">
+									<h:outputText value="" escape="false" />
+								</f:facet>
+								<p:commandButton onclick="calcular(#{estacion.latitude},#{estacion.longitude});" icon="ui-icon-search" title="Mostrar en mapa" />
+							</p:column>
+
+							<p:column style="text-align:center; width:5%" rendered="false">
+								<p:commandButton icon="ui-icon-signal-diag" title="Actualizar valor" action="#{pmpdMB.actualizarValorEstacion(estacion)}" update=":frmMapa:messages,:frmMapa:dtEstaciones" />
+							</p:column>
+
+
+						</p:dataTable>
+					</p:panelGrid>
+
+
+					<p:panelGrid columns="1" style="width: 100%; text-align:left">
+						<h:outputText value="#{messages.descripcion_pmd}" escape="false" />
+					</p:panelGrid>
+
+					<p:panelGrid columns="1" style="width: 100%; text-align:left">
+						<h:outputText value="#{messages.responsables_text}" escape="false" />
+					</p:panelGrid>
+
+					<p:panelGrid columns="1" style="width: 100%;">
+						<p:commandButton value="#{messages.referencias_tecnicas}" icon="ui-icon-help" type="button" onclick="PF('wvInfo').show();" />
+					</p:panelGrid>
+
+					<p:spacer />
+					<p:panelGrid columns="1" style="width: 100%; text-align:left">
+						<h:outputText id="otDisclaimer" value="#{messages.disclaimer_pmd}" escape="false" />
+					</p:panelGrid>
+
+					<p:panelGrid columns="1" style="width: 100%; text-align:right">
+						<h:graphicImage rendered="true" value="/images/logo.png" />
+					</p:panelGrid>
+				</p:fieldset>
+			</h:form>
+
+
+			<p:dialog header="#{messages.info_mapa_pmd}" widgetVar="wvInfo" minHeight="40" resizable="true" closable="true" maximizable="true" width="80%" height="600">
+
+				<object type="application/pdf" data="../docs/CRS-INA-SGA-IF-001-20-03.pdf?pfdrid_c=false" width="100%" height="100%">
+					<h:outputLabel value="#{messages.msj_navegador_pdf}" />
+					<a href="../docs/CRS-INA-SGA-IF-001-20-03.pdf">CRS-INA-SGA-IF-001-20-03.pdf</a>
+				</object>
+
+			</p:dialog>
+
+
+			<script src="pmpd.js?v=8;" type="text/javascript"></script>
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

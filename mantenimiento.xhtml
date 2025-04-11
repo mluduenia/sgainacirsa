@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+
+			<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+				<f:facet name="start">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+				</f:facet>
+
+				<f:facet name="complete">
+					<h:outputText value="" />
+				</f:facet>
+			</p:ajaxStatus>
+
+			<h:form id="form">
+				<p:messages id="messages" showDetail="true" redisplay="true" closable="true" />
+
+				<p:tabView id="tabViewMantenimiento">
+					<p:tab title="Calendario">
+						<p:panelGrid id="panelFiltroSchedule" style="width:100%">
+
+
+							<p:schedule value="#{mantenimientoMB.lazyEventModel}" draggable="false" rightHeaderTemplate="" view="month"
+								displayEventEnd="true" timeFormat="HH:mm" timeZone="GMT-3">
+								<!-- 
+							<p:ajax event="eventSelect" listener="#{mantenimientoMB.onEventSelect}" update="eventDetails"
+								oncomplete="PF('eventDialog').show();" />
+								 -->
+							</p:schedule>
+
+
+
+						</p:panelGrid>
+						<p:dialog widgetVar="eventDialog" header="Detalle" showEffect="clip" hideEffect="clip">
+							<h:panelGrid id="eventDetails" columns="2">
+								<p:outputLabel for="title" value="Sensor:" />
+								<p:inputText id="title" value="#{mantenimientoMB.event.title}" readonly="true" />
+
+								<p:outputLabel for="from" value="Desde:" />
+								<p:inputText id="from" value="#{mantenimientoMB.event.startDate}" readonly="true">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+								</p:inputText>
+
+								<p:outputLabel for="to" value="Hasta:" />
+								<p:inputText id="to" value="#{mantenimientoMB.event.endDate}" readonly="true">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+								</p:inputText>
+
+
+							</h:panelGrid>
+						</p:dialog>
+
+
+					</p:tab>
+
+
+
+					<p:tab title="#{messages.consulta_mantenimiento}" >
+						<p:panelGrid id="panelFiltro" style="width:70%">
+
+							<p:row>
+								<p:column>
+									<h:outputLabel value="#{messages.fecha_desde}:" />
+									<p:calendar autocomplete="off" id="fechaDesde" value="#{mantenimientoMB.filter.fechaDesde}" navigator="true"
+										display="inline" pattern="dd/MM/yyyy HH:mm" showButtonPanel="true" />
+								</p:column>
+
+								<p:column>
+									<h:outputLabel value="#{messages.fecha_hasta}:" />
+									<p:calendar id="fechaHasta" value="#{mantenimientoMB.filter.fechaHasta}" navigator="true" display="inline"
+										pattern="dd/MM/yyyy HH:mm" showButtonPanel="true" />
+								</p:column>
+
+								<p:column>
+									<h:outputLabel value="#{messages.sensor}:" />
+									<h:inputText value="#{mantenimientoMB.filter.sensor}" />
+								</p:column>
+
+							</p:row>
+
+						</p:panelGrid>
+						<p:panelGrid columns="1" style="width: 50%;">
+
+							<h:panelGroup>
+								<p:commandButton id="cmdSearch" ajax="true" value="#{messages.buscar}"
+									actionListener="#{mantenimientoMB.search}" icon="ui-icon-search"
+									update=":form:messages,:form:tabViewMantenimiento:dtMantenimiento" />
+
+								<p:commandButton id="cmdCancelFilter" ajax="true" value="#{messages.limpiar_filtros}"
+									actionListener="#{mantenimientoMB.cancelSearchFilter}" icon="ui-icon-refresh"
+									update=":form:messages,:form:tabViewMantenimiento:dtMantenimiento,panelFiltro" />
+
+							</h:panelGroup>
+
+
+							<p:dataTable id="dtMantenimiento" var="log" value="#{mantenimientoMB.lazyDataModel}" paginator="true" rows="20"
+								lazy="true" scrollable="true" scrollWidth="100%" resizableColumns="true" resizeMode="expand" rowKey="#{log.id}"
+								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}"
+								rowsPerPageTemplate="5,10,15,18,20,25,50">
+
+								<f:facet name="{Exporters}">
+									<h:commandLink style="vertical-align:middle;float:right;margin-right:1px" title="Exportar datos a excel">
+										<p:graphicImage value="/images/excel-icon.png" width="24" style="text-align:right" />
+										<p:dataExporter type="xls" target="dtMantenimiento" fileName="Mantenimiento" />
+									</h:commandLink>
+								</f:facet>
+
+								<p:column headerText="#{messages.fecha_desde}" style="text-align:center; width: 15%">
+									<h:outputText value="#{log.logTime}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="#{messages.fecha_hasta}" style="text-align:center; width: 15%">
+									<h:outputText value="#{log.insertTime}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="#{messages.sensor}" style="text-align:right; width: 10%" rendered="true">
+									<h:outputText value="#{log.insertData}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="0" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+
+							</p:dataTable>
+
+						</p:panelGrid>
+
+
+
+
+					</p:tab>
+
+
+				</p:tabView>
+
+
+
+
+
+			</h:form>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

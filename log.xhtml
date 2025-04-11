@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+
+
+
+			<h:form id="formLog">
+
+				<p:messages id="messages" showDetail="true" />
+
+				<p:poll id="poll_update" widgetVar="wv_poll_autoupdate" interval="60" listener="#{logMB.reload}" update="messages,dtLog" />
+
+				<p:panelGrid columns="2" style="width: 100%;">
+					<p:panelGrid columns="1" style="width: 100%; text-align:left">
+						<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+							<f:facet name="start">
+								<h:graphicImage value="/images/ajaxloadingbar.gif" title="#{messages.actualizando}" />
+							</f:facet>
+							<f:facet name="complete">
+								<h:outputText value="" />
+							</f:facet>
+						</p:ajaxStatus>
+					</p:panelGrid>
+					<p:panelGrid columns="1" style="width: 100%; text-align:right">
+						<p:selectBooleanCheckbox styleClass="booleanCheckbox" itemLabel="#{messages.actualizar_automaticamente1}" value="#{logMB.actualizar}">
+							<p:ajax listener="#{logMB.setAutoUpdate}" update="messages" />
+						</p:selectBooleanCheckbox>
+					</p:panelGrid>
+				</p:panelGrid>
+
+				<p:fieldset legend="Log" style="padding:0.2em 1em">
+					<p:panelGrid id="panelFiltro" style="width:100%">
+						<p:row>
+							<p:column>
+								<h:outputLabel value="#{messages.fecha_desde}:" />
+							</p:column>
+							<p:column>
+								<h:outputLabel value="#{messages.tipo}:" />
+							</p:column>
+							<p:column>
+								<h:outputLabel value="#{messages.mensaje}:" />
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:calendar autocomplete="off" id="fechaDesde" value="#{logMB.filter.fechaDesde}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm" showButtonPanel="true"
+									locale="#{loginMBean.locale}" />
+							</p:column>
+							<p:column>
+								<p:selectManyCheckbox id="basic" value="#{logMB.filter.tipos}">
+									<f:selectItem itemLabel="MANTENIMIENTO" itemValue="MANTENIMIENTO" />
+									<f:selectItem itemLabel="INFO" itemValue="INFO" />
+									<f:selectItem itemLabel="ERROR" itemValue="ERROR" />
+									<f:selectItem itemLabel="MONITOREAR" itemValue="MONITOREAR" />
+								</p:selectManyCheckbox>
+							</p:column>
+							<p:column>
+								<h:inputText value="#{logMB.filter.texto}" />
+							</p:column>
+
+
+						</p:row>
+					</p:panelGrid>
+
+					<p:panelGrid columns="1" style="width: 100%;">
+						<h:panelGroup>
+							<p:commandButton id="cmdSearch" ajax="true" value="#{messages.buscar}" actionListener="#{logMB.search}" icon="ui-icon-search" update=":formLog:messages,:formLog:dtLog" />
+
+							<p:commandButton id="cmdCancelFilter" ajax="true" value="#{messages.limpiar_filtros}" actionListener="#{logMB.cancelSearchFilter}" icon="ui-icon-refresh"
+								update=":formLog,:formLog:dtLog,panelFiltro" />
+
+						</h:panelGroup>
+
+						<p:dataTable id="dtLog" var="log" value="#{logMB.lazyDataModel}" paginator="true" rows="20" lazy="true" scrollable="true" scrollWidth="100%" resizableColumns="true" resizeMode="expand"
+							rowKey="#{log.id}" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" rowsPerPageTemplate="5,10,15,18,20,25,50">
+
+							<p:column headerText="Fecha/hora log" style="text-align:center; width: 15%">
+								<h:outputText value="#{log.logTime}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="#{messages.tipo}" style="text-align:left; width: 10%">
+								<h:outputText value="#{log.tipo}" title="#{log.tipo}" />
+							</p:column>
+
+							<p:column headerText="Mensaje" style="text-align:left; width: 60%">
+								<h:outputText value="#{log.insertTable}" title="#{log.insertTable}" />
+							</p:column>
+
+							<p:column headerText="Valor" style="text-align:right; width: 10%" rendered="false">
+								<h:outputText value="#{log.insertData}" />
+							</p:column>
+
+							<p:column rendered="false" headerText="Fecha/hora registro" style="text-align:center; width: 10%">
+								<h:outputText value="#{log.insertTime}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+								</h:outputText>
+							</p:column>
+						</p:dataTable>
+					</p:panelGrid>
+
+				</p:fieldset>
+			</h:form>
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

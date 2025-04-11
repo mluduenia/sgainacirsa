@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+
+
+			<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+				<f:facet name="start">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+				</f:facet>
+
+				<f:facet name="complete">
+					<h:outputText value="" />
+				</f:facet>
+			</p:ajaxStatus>
+
+			<h:form id="formUsuarios">
+				<p:messages id="messages" showDetail="true" redisplay="true" closable="true" />
+
+				<p:fieldset legend="Usuarios logueados al SGA" style="padding:0.2em 1em;">
+
+					<p:panelGrid columns="1" style="width: 100%;">
+
+						<p:dataTable id="dtUsuarios" var="usuario" value="#{loginMBean.listLoggedInUsers}" paginator="true" rows="10"
+							lazy="false" scrollable="true" scrollWidth="100%" resizableColumns="true" resizeMode="expand"
+							paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+							rowsPerPageTemplate="5,10,15,20,25,50">
+
+							<p:column headerText="#{messages.nombre_usuario}" sortBy="#{usuario.username}" style="width:20%">
+								<h:outputText value="#{usuario.username}" />
+							</p:column>
+								<p:column headerText="Fecha/Hora acceso" sortBy="#{usuario.ultimoAcceso}" style="width:20%">
+								<h:outputText value="#{usuario.ultimoAcceso}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+								</h:outputText>
+							</p:column>
+							
+							<p:column headerText="#{messages.nombre}" sortBy="#{usuario.nombre}" style="width:15%">
+								<h:outputText value="#{usuario.nombre}" />
+							</p:column>
+							<p:column headerText="#{messages.apellido}" sortBy="#{usuario.apellido}" style="width:15%">
+								<h:outputText value="#{usuario.apellido}" />
+							</p:column>
+							<p:column headerText="#{messages.email}" sortBy="#{usuario.email}" style="width:15%">
+								<h:outputText value="#{usuario.email}" />
+							</p:column>
+						
+							<p:column headerText="#{messages.rol}" sortBy="#{usuario.rol}" style="width:15%">
+								<h:outputText value="#{usuario.rol}" />
+							</p:column>
+
+
+
+						</p:dataTable>
+
+					</p:panelGrid>
+
+
+				</p:fieldset>
+
+
+			</h:form>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

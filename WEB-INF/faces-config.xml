@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <faces-config xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+    http://java.sun.com/xml/ns/javaee/web-facesconfig_2_1.xsd"
+	version="2.1">
+
+<!--
+	
+	<faces-config xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+        http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd"
+    version="2.2">
+ -->
+ 
+  <!-- 	  
+  
+<factory>
+        <exception-handler-factory>
+            ar.ina.alertas.exceptions.CustomExceptionHandlerFactory
+        </exception-handler-factory>
+</factory>
+
+<lifecycle>
+    <phase-listener>ar.ina.alertas.exceptions.AjaxLoginListener</phase-listener>
+</lifecycle>-->
+
+ 
+	<!-- JSF and Spring are integrated -->
+	<!-- Enable Spring -->
+	<application>
+		<el-resolver>org.springframework.web.jsf.el.SpringBeanFacesELResolver</el-resolver>
+		<locale-config>
+			<default-locale>es</default-locale>
+		</locale-config>
+		<resource-bundle>
+			<base-name>messages</base-name>
+			<var>messages</var>
+		</resource-bundle>
+		<action-listener>org.primefaces.application.DialogActionListener</action-listener>
+		<navigation-handler>org.primefaces.application.DialogNavigationHandler</navigation-handler>
+		<view-handler>org.primefaces.application.DialogViewHandler</view-handler>
+	</application>
+
+	
+
+<navigation-rule>
+		<from-view-id>/*</from-view-id>
+
+		<navigation-case>
+			<from-action>#{loginMBean.login}</from-action>
+			<from-outcome>correct</from-outcome>
+			<to-view-id>/index.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+
+	</navigation-rule>
+
+	
+	<!-- navigation-rule for menu -->
+	<navigation-rule>
+		<from-view-id>/*</from-view-id>
+		<navigation-case>
+			<from-outcome>index</from-outcome>
+			<to-view-id>/index.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>precipitaciones</from-outcome>
+			<to-view-id>/precipitaciones.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>precipitacionesIntervalo</from-outcome>
+			<to-view-id>/precipitacionesIntervalo.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>precipitacionesah</from-outcome>
+			<to-view-id>/precipitacionesah.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>lluviasMensuales</from-outcome>
+			<to-view-id>/lluviasMensuales.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>alertas</from-outcome>
+			<to-view-id>/alertas.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>cuencas</from-outcome>
+			<to-view-id>/cuencas.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>estaciones</from-outcome>
+			<to-view-id>/estaciones.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+
+	    <navigation-case>
+			<from-outcome>vadosPuentes</from-outcome>
+			<to-view-id>/vadosPuentes.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>pronosticos</from-outcome>
+			<to-view-id>/pronosticos.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>ecuaciones</from-outcome>
+			<to-view-id>/ecuaciones.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		
+		<navigation-case>
+			<from-outcome>usuarios</from-outcome>
+			<to-view-id>/usuarios.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>log</from-outcome>
+			<to-view-id>/log.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		
+		<navigation-case>
+			<from-outcome>login</from-outcome>
+			<to-view-id>/login.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapas</from-outcome>
+			<to-view-id>/mapas/mapas.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaACuencas</from-outcome>
+			<to-view-id>/mapas/mapaACuencas.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaACuencasFecha</from-outcome>
+			<to-view-id>/mapas/mapaACuencasFecha.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaEstaciones24pmp</from-outcome>
+			<to-view-id>/mapas/mapaEstaciones24pmp.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaEstaciones24</from-outcome>
+			<to-view-id>/mapas/mapaEstaciones24.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaEstaciones12</from-outcome>
+			<to-view-id>/mapas/mapaEstaciones12.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaEstaciones6</from-outcome>
+			<to-view-id>/mapas/mapaEstaciones6.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaEstaciones3</from-outcome>
+			<to-view-id>/mapas/mapaEstaciones3.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaEstaciones1</from-outcome>
+			<to-view-id>/mapas/mapaEstaciones1.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaAEstaciones631</from-outcome>
+			<to-view-id>/mapas/mapaAEstaciones631.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaEstacionesInfo</from-outcome>
+			<to-view-id>/mapas/mapaEstacionesInfo.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaCuencas</from-outcome>
+			<to-view-id>/mapas/mapaCuencas.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaSeveridadLocal</from-outcome>
+			<to-view-id>/mapas/mapaSeveridadLocal.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaEstacionesFI</from-outcome>
+			<to-view-id>/mapas/mapaEstacionesFI.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>idt</from-outcome>
+			<to-view-id>/mapas/idt.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>idtHome</from-outcome>
+			<to-view-id>/mapas/idtHome.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+	
+		<navigation-case>
+			<from-outcome>pmpd</from-outcome>
+			<to-view-id>/mapas/pmpd.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		
+		<navigation-case>
+			<from-outcome>mapaRadar</from-outcome>
+			<to-view-id>/mapas/mapaRadares.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>mapaRadarAcum</from-outcome>
+			<to-view-id>/mapas/mapaRadaresAcum.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>		
+		<navigation-case>
+			<from-outcome>grafico</from-outcome>
+			<to-view-id>/charts.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>limnigramaMonitoreo</from-outcome>
+			<to-view-id>/limnigramaMonitoreo.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>limnigramaIntervalo</from-outcome>
+			<to-view-id>/limnigramaIntervalo.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>hidrogramaIntervalo</from-outcome>
+			<to-view-id>/hidrogramaIntervalo.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>usuariosLogueados</from-outcome>
+			<to-view-id>/usuariosLogueados.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>consultaMantenimiento</from-outcome>
+			<to-view-id>/mantenimiento.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>cuencasGisDrenaje</from-outcome>
+			<to-view-id>/cuencasGisDrenaje.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>referencia</from-outcome>
+			<to-view-id>/referencia.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>parametros</from-outcome>
+			<to-view-id>/parametros.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>notificaciones</from-outcome>
+			<to-view-id>/notificaciones.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+
+
+
+</faces-config>

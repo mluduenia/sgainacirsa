@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+
+
+			<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+				<f:facet name="start">
+					<h:graphicImage value="/images/ajaxloadingbar.gif" />
+				</f:facet>
+
+				<f:facet name="complete">
+					<h:outputText value="" />
+				</f:facet>
+			</p:ajaxStatus>
+
+			<h:form id="formNotificaciones">
+				<p:messages id="messages" showDetail="true" redisplay="true" closable="true" />
+
+				<p:fieldset legend="#{messages['notificaciones']}" style="padding:0.2em 1em;">
+					<p:panel toggleable="true" header="Nueva notificación..." style="vertical-align:top" collapsed="true" rendered="true">
+
+						<p:panelGrid style="width: 100%;text-align:left" columns="1">
+
+							<p:panelGrid style="width: 100%" columns="2" columnClasses="colLabel,colValue">
+
+								<h:panelGroup>
+									<h:outputLabel value="* " styleClass="requerido" />
+									<h:outputLabel for="informa" value="#{messages.logo}: " />
+								</h:panelGroup>
+								<h:selectOneMenu value="#{notificacionesMB.oNotificaciones.informa}" label="#{messages.logo}" id="informa">
+									<f:selectItem itemValue="DC" itemLabel="DC" />
+									<f:selectItem itemValue="INACIRSA" itemLabel="INA/CIRSA" />
+								</h:selectOneMenu>
+
+								<h:panelGroup>
+									<h:outputLabel value="* " styleClass="requerido" />
+									<h:outputLabel for="titulo" value="#{messages.titulo}: " />
+								</h:panelGroup>
+								<!-- 
+								<h:selectOneMenu value="#{notificacionesMB.oNotificaciones.titulo}" label="#{messages.titulo}" id="titulo">
+									<f:selectItem itemValue="DC informa" itemLabel="DC informa" />
+									<f:selectItem itemValue="INA/CIRSA informa" itemLabel="INA/CIRSA informa" />
+								</h:selectOneMenu>
+								 -->
+								<h:inputText value="#{notificacionesMB.oNotificaciones.titulo}" maxlength="50" label="#{messages.titulo}" id="titulo" />
+								<h:panelGroup>
+									<h:outputLabel value="* " styleClass="requerido" />
+									<h:outputLabel for="mensaje" value="#{messages.mensaje}: " />
+								</h:panelGroup>
+								<p:inputTextarea id="mensaje" rows="2" cols="80" value="#{notificacionesMB.oNotificaciones.mensaje}" maxlength="200" />
+
+								<h:panelGroup>
+									<h:outputLabel value="* " styleClass="requerido" />
+									<h:outputLabel for="expira" value="#{messages.expiracion}: " />
+								</h:panelGroup>
+								<h:selectOneMenu id="expira" value="#{notificacionesMB.oNotificaciones.expira}" label="#{messages.expiracion}" title="#{messages.expiracion_title}">
+									<f:selectItem itemValue="3600" itemLabel="1 hora" />
+									<f:selectItem itemValue="7200" itemLabel="2 horas" />
+									<f:selectItem itemValue="21600" itemLabel="6 horas" />
+									<f:selectItem itemValue="43200" itemLabel="12 horas" />
+									<f:selectItem itemValue="86400" itemLabel="24 horas" />
+									<f:selectItem itemValue="604800" itemLabel="7 días" />
+									<f:selectItem itemValue="2419200" itemLabel="4 semanas" />
+								</h:selectOneMenu>
+
+								<h:outputText value="#{messages.vigente}?" />
+								<h:selectBooleanCheckbox value="#{notificacionesMB.oNotificaciones.vigente}" />
+
+
+							</p:panelGrid>
+
+
+
+						</p:panelGrid>
+
+						<p:panelGrid style="width: 100%;text-align: right;" columns="1">
+							<p:commandButton value="#{messages.agregar_notificacion}" action="#{notificacionesMB.addNotificaciones}" icon="ui-icon-plus" update="messages,formNotificaciones,dtNotificaciones" />
+						</p:panelGrid>
+
+					</p:panel>
+
+					<p:panelGrid columns="1" style="width: 100%;">
+
+						<p:dataTable id="dtNotificaciones" var="notificacion" value="#{notificacionesMB.lazyDataModel}" paginator="true" rows="10" lazy="true" editable="true" scrollable="true" scrollWidth="100%"
+							resizableColumns="false" resizeMode="expand" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+							rowsPerPageTemplate="5,10,15,20,25,50" rowKey="#{notificacion.id}">
+
+
+							<p:ajax event="rowEdit" listener="#{notificacionesMB.onRowEdit}" update=":formNotificaciones:messages" />
+							<p:ajax event="rowEditCancel" listener="#{notificacionesMB.onRowCancel}" update=":formNotificaciones:messages" />
+
+
+							<p:column style="text-align:center;width:10%" headerText="#{messages.fecha_alta}" sortBy="#{notificacion.fechaAlta}">
+								<f:facet name="header">
+									<h:outputText value="#{messages.fecha_alta}" />
+								</f:facet>
+								<h:outputText value="#{notificacion.fechaAlta}" title="#{notificacion.fechaAlta}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="#{messages.expiracion}" sortBy="#{notificacion.expira}" style="width:10%">
+								<h:selectOneMenu value="#{notificacion.expira}" style="width:100%" label="#{messages.expiracion}" title="#{messages.expiracion_title}" disabled="true">
+									<f:selectItem itemValue="3600" itemLabel="1 hora" />
+									<f:selectItem itemValue="7200" itemLabel="2 horas" />
+									<f:selectItem itemValue="21600" itemLabel="6 horas" />
+									<f:selectItem itemValue="43200" itemLabel="12 horas" />
+									<f:selectItem itemValue="86400" itemLabel="24 horas" />
+									<f:selectItem itemValue="604800" itemLabel="7 días" />
+									<f:selectItem itemValue="2419200" itemLabel="4 semanas" />
+								</h:selectOneMenu>
+							</p:column>
+
+
+							<p:column headerText="#{messages.logo}" sortBy="#{notificacion.informa}" style="width:5%">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{notificacion.informa}" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectOneMenu value="#{notificacion.informa}" label="#{messages.logo}" disabled="false">
+											<f:selectItem itemValue="DC" itemLabel="DC" />
+											<f:selectItem itemValue="INACIRSA" itemLabel="INA/CIRSA" />
+										</h:selectOneMenu>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+
+							<p:column style="width:15%" sortBy="#{notificacion.titulo}" headerText="#{messages.titulo}">
+
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{notificacion.titulo}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{notificacion.titulo}" label="#{messages.titulo}" maxlength="50" />
+									</f:facet>
+								</p:cellEditor>
+
+							</p:column>
+
+							<p:column style="width:25%" sortBy="#{notificacion.mensaje}" headerText="#{messages.mensaje}">
+
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{notificacion.mensaje}" title="#{notificacion.mensaje}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputTextarea id="mensaje" rows="2" cols="30" value="#{notificacion.mensaje}" maxlength="200" />
+
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="#{messages.vigente}" sortBy="#{notificacion.vigente}" style="width:5%;text-align:center">
+								<h:selectBooleanCheckbox value="#{notificacion.vigente}" disabled="true" />
+							</p:column>
+							<p:column style="text-align:center; width:10%" headerText="Vigente/No Vigente">
+								<p:commandButton icon=" ui-icon-tag" label="Setear Vigente/No Vigente" title="Setear Vigente/No Vigente" actionListener="#{notificacionesMB.changeVigente(notificacion)}"
+									update=":formNotificaciones:messages,:formNotificaciones:dtNotificaciones" />
+							</p:column>
+
+
+							<p:column headerText="#{messages.usuario}" sortBy="#{notificacion.usuario.username}" style="width:10%;text-align:center">
+								<h:outputText value="#{notificacion.usuario.username}" />
+							</p:column>
+
+							<p:column rendered="false">
+								<f:facet name="header">
+									<h:outputText value="#{messages.resultado}" title="#{messages.resultado}" />
+								</f:facet>
+								<h:outputText value="#{notificacion.resultado}" title="#{notificacion.resultado}" />
+							</p:column>
+
+
+							<p:column style="text-align:center; width:32px" headerText="Editar">
+								<p:rowEditor editTitle="#{messages.editar}" saveTitle="#{messages.guardar_cambios}" cancelTitle="#{messages.cancelar_edicion}" />
+							</p:column>
+
+
+						</p:dataTable>
+
+					</p:panelGrid>
+
+
+				</p:fieldset>
+
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+					<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+
+
+
+			</h:form>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

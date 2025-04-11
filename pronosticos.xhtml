@@ -1,0 +1,603 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+			<br></br>
+
+
+
+			<h:form id="formPronosticos">
+				<p:messages id="messages" showDetail="true" escape="false" />
+
+				<p:panel id="panelConsulta" style="width:100%" toggleable="true" header="#{messages.busqueda}..." collapsed="true">
+
+					<p:row>
+						<p:column>
+							<h:outputLabel value="#{messages.id}:" />
+							<p:inputText label="id de pronóstico" value="#{pronosticosMB.pronosticosFilter.idPronostico}" style="width:80px" />
+						</p:column>
+
+
+						<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+							<p:column rendered="true">
+								<h:outputText value="#{messages.mostrar}:" />
+								<p:selectOneMenu value="#{pronosticosMB.pronosticosFilter.mostrar}" style="vertical-align:middle;">
+									<f:selectItem itemLabel="TODOS" itemValue="" />
+									<f:selectItem itemLabel="SÍ" itemValue="true" />
+									<f:selectItem itemLabel="NO" itemValue="false" />
+								</p:selectOneMenu>
+							</p:column>
+						</sec:authorize>
+
+						<p:column rendered="false">
+							<h:outputLabel value="#{messages.fecha_desde}:" />
+							<p:calendar locale="#{loginMBean.locale}" id="fechaDesde" label="fecha desde" value="#{pronosticosMB.pronosticosFilter.fechaDesde}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm" />
+						</p:column>
+
+						<p:column rendered="false">
+							<h:outputLabel value="#{messages.fecha_hasta}:" />
+							<p:calendar locale="#{loginMBean.locale}" id="fechaHasta" label="fecha hasta" value="#{pronosticosMB.pronosticosFilter.fechaHasta}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm" />
+						</p:column>
+
+						<p:column rendered="false">
+							<h:outputText value="#{messages.cuenca}:" />
+							<p:selectOneMenu id="selCuencas" value="#{pronosticosMB.pronosticosFilter.idCuenca}" style="width:200px">
+								<f:selectItem itemLabel="SELECCIONE" itemValue="" />
+								<f:selectItems value="#{pronosticosMB.siCuencas}" />
+							</p:selectOneMenu>
+						</p:column>
+
+					</p:row>
+
+
+					<h:panelGroup>
+						<p:commandButton id="cmdSearch" ajax="true" value="#{messages.buscar}" actionListener="#{pronosticosMB.search}" icon="ui-icon-search" style="margin-left:10px"
+							update=":formPronosticos:messages,:formPronosticos:tabView:dtPronosticos,:formPronosticos:tabView:dtPronosticos2" />
+
+						<p:commandButton id="cmdCancelFilter" ajax="true" value="#{messages.limpiar_filtros}" actionListener="#{pronosticosMB.cancelSearchFilter}" icon="ui-icon-refresh"
+							update=":formPronosticos:messages,:formPronosticos:tabView:dtPronosticos,:formPronosticos:tabView:dtPronosticos2,panelConsulta" />
+
+					</h:panelGroup>
+				</p:panel>
+				<p:panelGrid style="width: 100%;text-align: right;" columns="1">
+					<h:panelGroup>
+						<p:commandButton rendered="false" id="cmdBorrarNoEnviados" ajax="true" value="#{messages.borrar_no_enviados}" actionListener="#{pronosticosMB.deletePronosticosNoEnviados}" icon="ui-icon-minus"
+							update=":formPronosticos:messages,:formPronosticos:tabView:dtPronosticos,:formPronosticos:tabView:dtPronosticos2" />
+
+						<p:commandButton rendered="false" id="cmdBorrarNoVerificados" ajax="true" value="#{messages.borrar_no_verificados}" actionListener="#{pronosticosMB.deletePronosticosNoVerificados}"
+							icon="ui-icon-minus" update=":formPronosticos:messages,:formPronosticos:tabView:dtPronosticos,:formPronosticos:tabView:dtPronosticos2" />
+
+						<p:commandButton rendered="true" id="cmdBorrarNoUtilizados" ajax="true" value="#{messages.borrar_no_utilizados}" title="#{messages.borrar_no_utilizados_title}"
+							actionListener="#{pronosticosMB.deletePronosticosNoUtilizados}" icon="ui-icon-trash"
+							update=":formPronosticos:messages,:formPronosticos:tabView:dtPronosticos,:formPronosticos:tabView:dtPronosticos2" />
+
+					</h:panelGroup>
+				</p:panelGrid>
+
+				<br />
+				<p:tabView id="tabView">
+					<p:tab title="#{messages.consulta_pronosticos} San Antonio - #{messages.modelo_ccpl}">
+
+						<br />
+
+						<p:panelGrid id="dtPanel" columns="1" style="width: 100%;">
+
+
+							<p:dataTable id="dtPronosticos" var="pronostico" value="#{pronosticosMB.lazyDataModel1}" paginator="true" rows="15" lazy="true" editable="true" resizeMode="expand" resizableColumns="true"
+								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" rowsPerPageTemplate="5,10,15,20,25,50"
+								rowKey="#{pronostico.id}">
+
+								<p:ajax event="rowEdit" listener="#{pronosticosMB.onRowEdit}" update=":formPronosticos:messages" />
+								<p:ajax event="rowEditCancel" listener="#{pronosticosMB.onRowCancel}" update=":formPronosticos:messages" />
+
+								<f:facet name="{Exporters}">
+									<h:commandLink style="vertical-align:middle;float:right;margin-right:1px" title="Exportar datos a excel">
+										<p:graphicImage value="/images/excel-icon.png" width="24" style="text-align:right" />
+										<p:dataExporter type="xls" target="dtPronosticos" fileName="listadoPronosticosModeloCCPL" postProcessor="#{pronosticosMB.postProcessXLS}" />
+									</h:commandLink>
+								</f:facet>
+
+								<p:column rendered="true" headerText="#{messages.id}" sortBy="#{pronostico.id}" style="width:40px">
+									<h:outputText value="#{pronostico.id}" />
+								</p:column>
+
+
+								<p:column style="text-align:center" headerText="#{messages.fecha_alta}" sortBy="#{pronostico.fecha}">
+									<f:facet name="header">
+										<h:outputText value="#{messages.fecha_alta_br}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.fecha}" title="#{pronostico.fecha}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+									</h:outputText>
+								</p:column>
+
+								<!-- SENSOR 1 -->
+								<p:column style="width:2%;text-align:right">
+									<f:facet name="header">
+										<h:outputText value="s1" title="Sensor 1" />
+									</f:facet>
+									<h:outputText value="#{pronostico.codigoSensor1}" />
+								</p:column>
+
+								<p:column style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_pico_s1}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorPicoSensor1}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+
+								<p:column style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_base_s1}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorBaseSensor1}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<p:column style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.hora_ocurrencia_pico_s1}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorHoraPicoSensor1}" title="#{pronostico.valorHoraPicoSensor1}">
+										<f:convertDateTime pattern="HH:mm dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+								<!-- SENSOR 2 -->
+								<p:column style="width:2%;text-align:right" rendered="false">
+									<f:facet name="header">
+										<h:outputText value="s2" title="Sensor 2" />
+									</f:facet>
+									<h:outputText value="#{pronostico.codigoSensor2}" />
+								</p:column>
+
+								<p:column style="text-align:right" rendered="false">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_pico_s2}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorPicoSensor2}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+
+								</p:column>
+
+								<p:column style="text-align:right" rendered="false">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_base_s2}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorBaseSensor2}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<p:column style="text-align:right" rendered="false">
+									<f:facet name="header">
+										<h:outputText value="#{messages.hora_ocurrencia_pico_s2}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorHoraPicoSensor2}" title="#{pronostico.valorHoraPicoSensor2}">
+										<f:convertDateTime pattern="HH:mm dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+
+								<!-- actual en 604 -->
+
+								<!-- SENSOR pronostico -->
+								<p:column style="width:2%;text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.sensor_pron_br}" escape="false" title="#{messages.sensor_pronostico_title}" />
+									</f:facet>
+									<h:outputText value="#{pronostico.codigoSensorPronostico}" />
+								</p:column>
+
+								<p:column style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_actual_sp}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorBaseSensorPronostico}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<!-- estacion lluvia acumulada -->
+								<p:column headerText="#{messages.est_lluvia_acumulada}" style="width:2%;text-align:right">
+									<h:outputText value="#{pronostico.codigoEstLluviaAcumulada}" />
+								</p:column>
+
+								<p:column headerText="#{messages.lluvia_acumulada}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.lluvia_acumulada}" escape="false" />
+									</f:facet>
+									<h:outputText value="(#{pronostico.cdadHorasLluviaAcumulada}hs)=#{pronostico.valorLluviaAcumulada}" />
+								</p:column>
+
+								<p:column style="width:2%;">
+									<f:facet name="header">
+										<h:outputText value="#{messages.id_ecuacion_br}" title="#{messages.id_ecuacion_title}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.ecuacion.id}" />
+								</p:column>
+
+
+								<p:column rendered="false" headerText="#{messages.nombre_ecuacion}" sortBy="#{pronostico.ecuacion.nombre}" style="width:50px">
+									<h:outputText value="#{pronostico.ecuacion.nombre}" />
+								</p:column>
+
+								<p:column rendered="false" headerText="#{messages.ecuacion_hora_pico}" sortBy="#{pronostico.ecuacion.ecuacionHoraPico}" style="width:50px">
+									<h:outputText value="#{pronostico.ecuacion.ecuacionHoraPico}" />
+								</p:column>
+
+								<p:column rendered="false" headerText="#{messages.ecuacion_nivel}" sortBy="#{pronostico.ecuacion.ecuacionCrecidaM}" style="width:50px">
+									<h:outputText value="#{pronostico.ecuacion.ecuacionCrecidaM}" />
+								</p:column>
+
+								<!-- PRONOSTICO -->
+								<p:column headerText="#{messages.hora_estimada}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.hora_estimada}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.horaArriboPicoPronostico}" title="#{pronostico.horaArriboPicoPronostico}">
+										<f:convertDateTime pattern="HH:mm dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="#{messages.nivel_estimado}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_estimado}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorCrecidaPronostico}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<!-- REAL -->
+								<p:column headerText="#{messages.hora_real}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.hora_real}" escape="false" />
+									</f:facet>
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{pronostico.horaArriboPicoReal}" title="#{pronostico.horaArriboPicoReal}">
+												<f:convertDateTime pattern="HH:mm dd/MM/yyyy" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:calendar style="width:100px" label="#{messages.hora_real}" value="#{pronostico.horaArriboPicoReal}" navigator="true" display="inline" pattern="dd/MM/yyyy HH:mm" showButtonPanel="true" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="#{messages.nivel_real}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_real}" escape="false" />
+									</f:facet>
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{pronostico.valorCrecidaReal}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{pronostico.valorCrecidaReal}" label="#{messages.nivel_real}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="#{messages.mostrar}" style="width:5%;text-align:center">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:selectBooleanCheckbox value="#{pronostico.mostrar}" disabled="true" />
+										</f:facet>
+										<f:facet name="input">
+											<h:selectBooleanCheckbox value="#{pronostico.mostrar}" label="#{messages.mostrar}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column style="text-align:right" rendered="true">
+									<f:facet name="header">
+										<h:outputText value="#{messages.fecha_envio_mail}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.fechaEnvioMail}" title="#{pronostico.fechaEnvioMail}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+									</h:outputText>
+								</p:column>
+
+								<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+								
+									<p:column style="text-align:center; width:32px">
+										<p:commandButton id="cmdBorrarPronostico" icon="ui-icon-trash" title="#{messages.borrar}" actionListener="#{pronosticosMB.deletePronostico(pronostico)}"
+											update=":formPronosticos:messages,dtPronosticos">
+											<p:confirm header="Confirmación" message="¿Desea borrar el registro con id #{pronostico.id}?" icon="ui-icon-alert" />
+										</p:commandButton>
+									</p:column>
+
+									<p:column style="text-align:center; width:32px">
+										<p:commandButton id="cmdEnviarMail" icon="ui-icon-mail-closed" title="#{messages.enviar_mail}" actionListener="#{pronosticosMB.sendMailPronostico(pronostico)}"
+											update=":formPronosticos:messages,dtPronosticos" disabled="#{pronostico.fechaEnvioMail!=null}">
+											<p:confirm header="Confirmación" message="¿Desea enviar mail con pronóstico  con id #{pronostico.id} a usuarios suscriptos?" icon="ui-icon-alert" />
+										</p:commandButton>
+									</p:column>
+
+
+									<p:column style="text-align:center; width:32px">
+										<p:rowEditor editTitle="#{messages.editar}" saveTitle="#{messages.guardar_cambios}" cancelTitle="#{messages.cancelar_edicion}" />
+									</p:column>
+								</sec:authorize>
+							</p:dataTable>
+						</p:panelGrid>
+
+					</p:tab>
+
+
+					<p:tab title="#{messages.consulta_pronosticos} San Antonio - #{messages.modelo_unificado}">
+
+						<p:panelGrid id="dtPanel2" columns="1" style="width: 100%;">
+
+							<p:dataTable id="dtPronosticos2" var="pronostico" value="#{pronosticosMB.lazyDataModel2}" paginator="true" rows="15" lazy="true" editable="true" resizeMode="expand" resizableColumns="true"
+								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" rowsPerPageTemplate="5,10,15,20,25,50"
+								rowKey="#{pronostico.id}">
+
+								<p:ajax event="rowEdit" listener="#{pronosticosMB.onRowEdit}" update=":formPronosticos:messages" />
+								<p:ajax event="rowEditCancel" listener="#{pronosticosMB.onRowCancel}" update=":formPronosticos:messages" />
+
+								<f:facet name="{Exporters}">
+									<h:commandLink style="vertical-align:middle;float:right;margin-right:1px" title="Exportar datos a excel">
+										<p:graphicImage value="/images/excel-icon.png" width="24" style="text-align:right" />
+										<p:dataExporter type="xls" target="dtPronosticos2" fileName="listadoPronosticosModeloUnificado" postProcessor="#{pronosticosMB.postProcessXLS}" />
+									</h:commandLink>
+								</f:facet>
+
+
+								<p:column rendered="true" headerText="#{messages.id}" sortBy="#{pronostico.id}" style="width:40px">
+									<h:outputText value="#{pronostico.id}" />
+								</p:column>
+
+
+								<p:column style="text-align:center" headerText="#{messages.fecha_alta}" sortBy="#{pronostico.fecha}">
+									<f:facet name="header">
+										<h:outputText value="#{messages.fecha_alta_br}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.fecha}" title="#{pronostico.fecha}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+									</h:outputText>
+								</p:column>
+
+								<!-- SENSOR 1 -->
+								<p:column style="width:2%;text-align:right">
+									<f:facet name="header">
+										<h:outputText value="s1" title="Sensor 1" />
+									</f:facet>
+									<h:outputText value="#{pronostico.codigoSensor1}" />
+								</p:column>
+
+								<p:column style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_pico_s1}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorPicoSensor1}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+
+								<p:column style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_base_s1}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorBaseSensor1}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<p:column style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.hora_ocurrencia_pico_s1}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorHoraPicoSensor1}" title="#{pronostico.valorHoraPicoSensor1}">
+										<f:convertDateTime pattern="HH:mm dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+								<!-- SENSOR 2 -->
+								<p:column style="width:2%;text-align:right">
+									<f:facet name="header">
+										<h:outputText value="s2" title="Sensor 2" />
+									</f:facet>
+									<h:outputText value="#{pronostico.codigoSensor2}" />
+								</p:column>
+
+								<p:column style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_pico_s2}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorPicoSensor2}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+
+								</p:column>
+
+								<p:column style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_base_s2}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorBaseSensor2}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<p:column style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.hora_ocurrencia_pico_s2}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorHoraPicoSensor2}" title="#{pronostico.valorHoraPicoSensor2}">
+										<f:convertDateTime pattern="HH:mm dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+
+								<!-- actual en 604 -->
+
+								<!-- SENSOR pronostico -->
+								<p:column style="width:2%;text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.sensor_pron_br}" escape="false" title="#{messages.sensor_pronostico_title}" />
+									</f:facet>
+									<h:outputText value="#{pronostico.codigoSensorPronostico}" />
+								</p:column>
+
+								<p:column style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_actual_sp}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorBaseSensorPronostico}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<!-- estacion lluvia acumulada -->
+								<p:column headerText="#{messages.est_lluvia_acumulada}" style="width:2%;text-align:right">
+									<h:outputText value="#{pronostico.codigoEstLluviaAcumulada}" />
+								</p:column>
+
+								<p:column headerText="#{messages.lluvia_acumulada}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.lluvia_acumulada}" escape="false" />
+									</f:facet>
+									<h:outputText value="(#{pronostico.cdadHorasLluviaAcumulada}hs)=#{pronostico.valorLluviaAcumulada}" />
+								</p:column>
+
+								<p:column style="width:2%;">
+									<f:facet name="header">
+										<h:outputText value="#{messages.id_ecuacion_br}" title="#{messages.id_ecuacion_title}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.ecuacion.id}" />
+								</p:column>
+
+
+								<p:column rendered="false" headerText="#{messages.nombre_ecuacion}" sortBy="#{pronostico.ecuacion.nombre}" style="width:50px">
+									<h:outputText value="#{pronostico.ecuacion.nombre}" />
+								</p:column>
+
+								<p:column rendered="false" headerText="#{messages.ecuacion_hora_pico}" sortBy="#{pronostico.ecuacion.ecuacionHoraPico}" style="width:50px">
+									<h:outputText value="#{pronostico.ecuacion.ecuacionHoraPico}" />
+								</p:column>
+
+								<p:column rendered="false" headerText="#{messages.ecuacion_nivel}" sortBy="#{pronostico.ecuacion.ecuacionCrecidaM}" style="width:50px">
+									<h:outputText value="#{pronostico.ecuacion.ecuacionCrecidaM}" />
+								</p:column>
+
+								<!-- PRONOSTICO -->
+								<p:column headerText="#{messages.hora_estimada}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.hora_estimada}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.horaArriboPicoPronostico}" title="#{pronostico.horaArriboPicoPronostico}">
+										<f:convertDateTime pattern="HH:mm dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="#{messages.nivel_estimado}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_estimado}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{pronostico.valorCrecidaPronostico}">
+										<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<!-- REAL -->
+								<p:column headerText="#{messages.hora_real}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.hora_real}" escape="false" />
+									</f:facet>
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{pronostico.horaArriboPicoReal}" title="#{pronostico.horaArriboPicoReal}">
+												<f:convertDateTime pattern="HH:mm dd/MM/yyyy" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:calendar locale="#{loginMBean.locale}" style="width:100px" label="#{messages.hora_real}" value="#{pronostico.horaArriboPicoReal}" navigator="true" display="inline"
+												pattern="dd/MM/yyyy HH:mm" showButtonPanel="true" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="#{messages.nivel_real}" style="text-align:right">
+									<f:facet name="header">
+										<h:outputText value="#{messages.nivel_real}" escape="false" />
+									</f:facet>
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{pronostico.valorCrecidaReal}">
+												<f:convertNumber minFractionDigits="0" maxFractionDigits="2" groupingUsed="false" locale="en" />
+											</h:outputText>
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{pronostico.valorCrecidaReal}" label="#{messages.nivel_real}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="#{messages.mostrar}" style="width:5%;text-align:center">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:selectBooleanCheckbox value="#{pronostico.mostrar}" disabled="true" />
+										</f:facet>
+										<f:facet name="input">
+											<h:selectBooleanCheckbox value="#{pronostico.mostrar}" label="#{messages.mostrar}" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+
+
+								<sec:authorize access="hasAnyRole('ADMIN','SUPERVISOR')">
+									<p:column style="text-align:center; width:32px">
+										<p:commandButton id="cmdBorrarPronostico" icon="ui-icon-trash" title="#{messages.borrar}" actionListener="#{pronosticosMB.deletePronostico(pronostico)}"
+											update=":formPronosticos:messages,dtPronosticos2">
+											<p:confirm header="Confirmación" message="¿Desea borrar el registro con id #{pronostico.id}?" icon="ui-icon-alert" />
+										</p:commandButton>
+									</p:column>
+
+									<p:column style="text-align:center; width:32px">
+										<p:rowEditor editTitle="#{messages.editar}" saveTitle="#{messages.guardar_cambios}" cancelTitle="#{messages.cancelar_edicion}" />
+									</p:column>
+								</sec:authorize>
+							</p:dataTable>
+						</p:panelGrid>
+
+					</p:tab>
+
+				</p:tabView>
+
+
+
+
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+					<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+
+			</h:form>
+
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

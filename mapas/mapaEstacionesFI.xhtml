@@ -1,0 +1,112 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+
+	<ui:composition template="../template/template.xhtml">
+		<ui:define name="content">
+
+			<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdR06M2wq1XRh73M-egCkmnuD3Vzw91SU" type="text/javascript" />
+
+
+			<h:form id="frmMapa">
+				<p:messages id="messages" showDetail="true" escape="false" />
+
+				<br />
+
+				<p:fieldset legend="#{messages.lluvias_intervalo_fechas}">
+
+					<p:panelGrid columns="3" style="width: 100%">
+						<p:panelGrid columns="1" style="width: 100%; text-align:left">
+							<p:spacer />
+							<h:outputLabel value="(#{messages.msj_drenaje_fecha_hasta})" />
+						</p:panelGrid>
+
+						<p:panelGrid id="panelFecha1" columns="1" style="width: 100%; text-align:right">
+							<h:outputLabel value="#{messages.seleccionar_fecha_desde}:" />
+							<p:calendar id="idCalendarSelectionDesde" value="#{mapDateRangeMB.selectedDateDesde}" pattern="dd/MM/yyyy" widgetVar="wvCalendarSelectionDesde" locale="#{loginMBean.locale}" required="true">
+								<p:ajax event="dateSelect" listener="#{mapDateRangeMB.listenerDateSelectionDesde}" update="messages,idCalendarSelectionDesde,idCalendarSelectionHasta" />
+
+							</p:calendar>
+						</p:panelGrid>
+
+						<p:panelGrid id="panelFecha2" columns="1" style="width: 100%; text-align:right">
+							<h:outputLabel value="#{messages.seleccionar_fecha_hasta}:" />
+							<p:calendar id="idCalendarSelectionHasta" value="#{mapDateRangeMB.selectedDateHasta}" required="true" pattern="dd/MM/yyyy" widgetVar="wvCalendarSelectionHasta" locale="#{loginMBean.locale}"
+								maxdate="#{mapDateRangeMB.currentDate}">
+								<p:ajax event="dateSelect" listener="#{mapDateRangeMB.listenerDateSelectionHasta}" update="messages,idCalendarSelectionDesde,idCalendarSelectionHasta" />
+							</p:calendar>
+						</p:panelGrid>
+					</p:panelGrid>
+
+
+
+					<div id="map" style="height: 900px">
+						<div id="gmap" class="fill"></div>
+						<div id="olmap" class="fill"></div>
+
+					</div>
+
+					<div id="wrapper">
+						<div id="location" style="float: right"></div>
+						<div id="scale" class="escala"></div>
+
+					</div>
+
+					<p:panelGrid columns="1" style="width: 100%; ">
+						<h:panelGroup>
+							<h:outputLabel value="#{messages.referencias}:" />
+							<p:panelGrid columns="1" style="width: 100%; text-align:left">
+								<h:graphicImage rendered="true"
+									value="#{messages.wms}?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=wspCirsa%3AsgaViewDWData24h&amp;scale=700000&amp;transparent=false&amp;LEGEND_OPTIONS=forceRule:True;borderColor:0000ff;border:true;fontSize:16;font-family:Arial" />
+							</p:panelGrid>
+						</h:panelGroup>
+						
+					</p:panelGrid>
+
+					<p:panelGrid id="pDisclaimer" columns="1" style="width: 100%;">
+						<h:outputText value="#{messages.disclaimer}" escape="false" />
+					</p:panelGrid>
+
+					<p:panelGrid columns="1" style="width: 100%; text-align:right">
+						<h:graphicImage rendered="true" value="/images/logo.png" />
+					</p:panelGrid>
+				</p:fieldset>
+			</h:form>
+
+			<script src="ol.js" type="text/javascript"></script>
+			<script src="mapaEstacionesFI.js" type="text/javascript"></script>
+
+
+			<script type="text/javascript">
+				function reloadMaps() {
+
+					var pDateSelectedDesde = document.getElementById('frmMapa:idCalendarSelectionDesde_input').value + " 00:00";
+					var pDateSelectedHasta = document.getElementById('frmMapa:idCalendarSelectionHasta_input').value + " 23:59";
+
+					var date1 = new Date(pDateSelectedDesde);
+					var date2 = new Date(pDateSelectedHasta);
+
+					// mapa de lluvia sumarizada y de nivel según fecha hasta
+					var viewparams = [ 'p_fecha_desde:' + pDateSelectedDesde, 'p_fecha_hasta:' + pDateSelectedHasta ];
+					var source = untiled.getSource();
+					var params = source.getParams();
+					params.viewparams = viewparams.join(';');
+					source.updateParams(params);
+
+					// mapa de drenaje según fecha hasta
+					var viewparamsDrenaje = [ 'p_fecha:' + pDateSelectedHasta ];
+					var sourceDrenaje = untiledDrenaje.getSource();
+					var paramsDrenaje = sourceDrenaje.getParams();
+					paramsDrenaje.viewparams = viewparamsDrenaje;
+
+					sourceDrenaje.updateParams(paramsDrenaje);
+				}
+			</script>
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

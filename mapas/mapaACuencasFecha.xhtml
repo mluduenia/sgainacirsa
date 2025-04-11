@@ -1,0 +1,90 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+
+	<ui:composition template="../template/template.xhtml">
+		<ui:define name="content">
+			<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdR06M2wq1XRh73M-egCkmnuD3Vzw91SU" type="text/javascript" />
+
+			<h:form id="frmMapa">
+				<p:messages id="messages" showDetail="true" />
+				<br />
+				<p:fieldset legend="#{messages.amenazas_calculadas_historico}">
+
+
+					<p:panelGrid columns="2" style="width: 100%">
+						<p:panelGrid id="panelFecha" columns="1" style="width: 100%; text-align:right">
+
+							<h:outputLabel value="#{messages.seleccionar_fecha_hora}:" />
+							<p:calendar id="idCalendarSelection" value="#{mapsLoaderMB.selectedDate}" pattern="dd/MM/yyyy HH:mm" showButtonPanel="true" widgetVar="wvCalendarSelection" locale="#{loginMBean.locale}">
+								<p:ajax event="dateSelect" oncomplete="reloadMaps()" />
+							</p:calendar>
+
+						</p:panelGrid>
+					</p:panelGrid>
+
+
+
+					<div id="map" class="map" style="height: 900px">
+						<div id="gmap" class="fill"></div>
+						<div id="olmap" class="fill"></div>
+					</div>
+
+					<div id="wrapper">
+						<div id="location" style="float: right"></div>
+						<div id="scale" class="escala"></div>
+					</div>
+
+					<ui:include src="/leyendas3.xhtml" />
+
+
+					<p:spacer height="10" />
+
+					<p:panelGrid id="pDisclaimer" columns="1" style="width: 100%">
+						<h:outputText value="#{messages.disclaimer}" escape="false" />
+					</p:panelGrid>
+
+					<p:panelGrid columns="1" style="width: 100%; text-align:right">
+						<h:graphicImage rendered="true" value="/images/logo.png" />
+					</p:panelGrid>
+
+				</p:fieldset>
+			</h:form>
+
+
+			<script src="ol.js" type="text/javascript"></script>
+			<script src="mapaACuencasFecha.js" type="text/javascript"></script>
+
+			<script type="text/javascript">
+				//<![CDATA[
+				function reloadMaps() {
+					var pDateSelected = document.getElementById('frmMapa:idCalendarSelection_input').value;
+
+					var viewparams = [ 'p_fecha:' + pDateSelected ];
+					var source = untiled.getSource();
+					var params = source.getParams();
+					params.viewparams = viewparams.join(';');
+					source.updateParams(params);
+
+					var sourceDrenaje = untiledDrenaje.getSource();
+					var paramsDrenaje = sourceDrenaje.getParams();
+					paramsDrenaje.viewparams = viewparams;
+					sourceDrenaje.updateParams(paramsDrenaje);
+
+					var sourceCuencas = untiledCuencas.getSource();
+					var paramsCuencas = sourceCuencas.getParams();
+					paramsCuencas.viewparams = viewparams;
+					sourceCuencas.updateParams(paramsCuencas);
+
+				}
+				//]]>
+			</script>
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

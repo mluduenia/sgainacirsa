@@ -1,0 +1,227 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+
+	<ui:composition template="../template/template.xhtml">
+		<ui:define name="content">
+
+			<style type="text/css">
+.column {
+	float: left;
+}
+</style>
+
+			<!-- n -->
+			<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdR06M2wq1XRh73M-egCkmnuD3Vzw91SU" type="text/javascript"></script>
+
+			<!-- v
+			<script src="https://maps.google.com/maps/api/js?key=AIzaSyA7ZKV8MMQrPXgbDJerCLWG1_NhnFDqGd0&amp;v=3"></script> -->
+
+			<h:form id="frmMapa">
+				<p:messages id="messages" showDetail="true" />
+
+				<br />
+				<p:fieldset legend="#{messages.severidad_local_historico}">
+
+					<p:panelGrid style="width:100%">
+						<p:row>
+							<p:column>
+								<h:outputLabel value="#{messages.latitud}:" />
+							</p:column>
+							<p:column>
+								<h:outputLabel value="#{messages.longitud}:" />
+							</p:column>
+							<p:column>
+								<h:outputLabel value="#{messages.recurrencia} [años]:" />
+							</p:column>
+							<p:column>
+								<h:outputLabel value="#{messages.duracion} [min]:" />
+							</p:column>
+							<p:column>
+								<h:outputLabel value="#{messages.actualizar}" />
+							</p:column>
+							<p:column>
+								<h:outputLabel value="#{messages.valor_idt_puntual}:" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:inputText id="it_lat" value="#{idtMB.lat}" label="#{messages.latitud}" style="width:200px" required="true" />
+							</p:column>
+							<p:column>
+								<p:inputText id="it_lon" value="#{idtMB.lon}" style="width:200px" label="#{messages.longitud}" required="true" />
+							</p:column>
+							<p:column>
+								<h:inputText id="it_recurrencia" value="#{idtMB.recurrencia}" style="width:100px" label="#{messages.recurrencia} [años]" />
+							</p:column>
+							<p:column>
+								<h:inputText id="it_duracion" value="#{idtMB.duracion}" style="width:100px" label="#{messages.duracion} [min]" />
+							</p:column>
+
+							<p:column>
+								<p:commandButton action="#{idtMB.updateValue}" update=":frmMapa:messages,:frmMapa:it_valor" icon="ui-icon-search" title="#{messages.title_actualizar_idt}" />
+							</p:column>
+							<p:column>
+								<p:inputText id="it_valor" value="#{idtMB.valor}" style="width:100px" readonly="true">
+									<f:convertNumber minFractionDigits="1" maxFractionDigits="1" groupingUsed="false" locale="en" />
+								</p:inputText>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+
+
+					<p:spacer width="20"></p:spacer>
+
+					<p:panelGrid columns="2" style="width: 100%;" columnClasses="alignTop2Col50,alignTop2Col50">
+
+						<p:panelGrid columns="1" style="width: 100%;">
+							<!-- MAP -->
+							<div id="map" class="map" style="height: 450px">
+								<div id="gmap" class="fill"></div>
+								<div id="olmap" class="fill"></div>
+							</div>
+							<div id="wrapper" class="escala">
+								<div id="location" style="float: right"></div>
+								<div id="scale"></div>
+								<div id="nodelist">
+									Haga click en un punto para obtener su valor
+								</div>
+								<div id="estaciones"></div>
+							</div>
+						</p:panelGrid>
+
+						<p:panelGrid columns="1" style="width: 100%;">
+							<h:outputLabel value="#{messages.valores_idt_punto}:" />
+							<h:outputLabel rendered="#{not empty request.remoteUser}" id="ol_params" value="(A:#{idtMB.paramA} B:#{idtMB.paramB} C:#{idtMB.paramC})" style="font-size: 12px;" />
+							<p:dataTable id="dtIdts" var="idt" value="#{idtMB.idtList}" paginator="true" rows="16" lazy="false" editable="false" scrollable="true" scrollWidth="100%" resizableColumns="true"
+								resizeMode="expand" paginatorTemplate="{Exporters}">
+
+								<f:facet name="{Exporters}">
+									<h:commandLink style="vertical-align:middle;float:right;margin-right:1px" title="#{messages.exportar_excel}">
+										<p:graphicImage value="/images/excel-icon.png" width="24" style="text-align:right" />
+										<p:dataExporter type="xls" target="dtIdts" fileName="idt" />
+									</h:commandLink>
+								</f:facet>
+
+								<p:column style="width:5%">
+									<f:facet name="header">
+										<h:outputText value="#{messages.duracion_br}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{idt.duracionMin}" />
+								</p:column>
+
+								<p:column style="width:5%">
+									<f:facet name="header">
+										<h:outputText value="#{messages.rec_2_br}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{idt.idtArray[0]}">
+										<f:convertNumber minFractionDigits="1" maxFractionDigits="1" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<p:column style="width:5%">
+									<f:facet name="header">
+										<h:outputText value="#{messages.rec_5_br}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{idt.idtArray[1]}">
+										<f:convertNumber minFractionDigits="1" maxFractionDigits="1" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<p:column style="width:5%">
+									<f:facet name="header">
+										<h:outputText value="#{messages.rec_10_br}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{idt.idtArray[2]}">
+										<f:convertNumber minFractionDigits="1" maxFractionDigits="1" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<p:column style="width:5%">
+									<f:facet name="header">
+										<h:outputText value="#{messages.rec_25_br}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{idt.idtArray[3]}">
+										<f:convertNumber minFractionDigits="1" maxFractionDigits="1" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<p:column style="width:5%">
+									<f:facet name="header">
+										<h:outputText value="#{messages.rec_50_br}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{idt.idtArray[4]}">
+										<f:convertNumber minFractionDigits="1" maxFractionDigits="1" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+
+								<p:column style="width:5%">
+									<f:facet name="header">
+										<h:outputText value="#{messages.rec_100_br}" escape="false" />
+									</f:facet>
+									<h:outputText value="#{idt.idtArray[5]}">
+										<f:convertNumber minFractionDigits="1" maxFractionDigits="1" groupingUsed="false" locale="en" />
+									</h:outputText>
+								</p:column>
+							</p:dataTable>
+
+							<h:inputHidden id="it_valor_A" value="#{idtMB.paramA}" />
+							<h:inputHidden id="it_valor_B" value="#{idtMB.paramB}" />
+							<h:inputHidden id="it_valor_C" value="#{idtMB.paramC}" />
+
+							<p:commandButton id="cmdCalcularIdt" style="display: none" actionListener="#{idtMB.calcularTablaIdt}" icon="ui-icon-search"
+								update=":frmMapa:dtIdts,chart_idt_1,chart_idt_2,ol_params,:frmMapa:messages,:frmMapa:it_valor" />
+
+
+						</p:panelGrid>
+
+					</p:panelGrid>
+
+					<p:panelGrid columns="2" style="width: 100%;">
+						<p:chart id="chart_idt_1" widgetVar="wvChart1" type="line" model="#{idtMB.lineModel1}" style="height:400px;" />
+						<p:chart id="chart_idt_2" widgetVar="wvChart2" type="line" model="#{idtMB.lineModel2}" style="height:400px;" />
+					</p:panelGrid>
+
+					<p:panelGrid columns="2" style="width: 100%;">
+						<p:commandButton type="button" value="#{messages.exportar_grafico}" icon="ui-icon-extlink" onclick="exportChart('wvChart1')" />
+						<p:commandButton type="button" value="#{messages.exportar_grafico}" icon="ui-icon-extlink" onclick="exportChart('wvChart2')" />
+					</p:panelGrid>
+
+					<p:spacer width="20"></p:spacer>
+					<p:panelGrid columns="4" style="width: 100%; text-align:middle">
+
+						<h:graphicImage rendered="true" value="/images/logo-FCEFyN.png" title="Facultad de Ciencias Exactas, Físicas y Naturales de la Universidad Nacional de Córdoba" />
+						<h:graphicImage rendered="true" value="/images/logo_ucc.gif" width="150" />
+						<h:graphicImage rendered="true" value="/images/logo_ucasal.jpeg" width="120" />
+						<h:graphicImage rendered="true" value="/images/logo.png" />
+					</p:panelGrid>
+
+
+
+				</p:fieldset>
+			</h:form>
+
+			<p:dialog widgetVar="dlg" showEffect="fade" modal="true" header="#{messages.imagen_grafico}" resizable="false" position="center top">
+				<p:outputPanel id="output" layout="block" style="width:500px;height:300px" />
+			</p:dialog>
+
+			<script type="text/javascript">
+				function exportChart(p_chart) {
+					$('#output').empty().append(PF(p_chart).exportAsImage());
+					PF('dlg').show();
+				}
+			</script>
+
+			<script src="ol.js" type="text/javascript"></script>
+			<script src="idt.js" type="text/javascript"></script>
+
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+

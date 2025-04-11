@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:sec="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="
+     http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/security
+    http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+
+	<!-- Enable method level Spring Security by annotations -->
+	<sec:global-method-security pre-post-annotations="enabled" />
+
+	<sec:http auto-config="true" use-expressions="true">
+		
+		
+		<sec:intercept-url pattern="/login.xhtml" access="permitAll" />
+		<sec:intercept-url pattern="/alertas.xhtml" access="permitAll" />
+		<sec:intercept-url pattern="/getnvlist" access="permitAll" />
+		
+		<sec:intercept-url pattern="/mapas/mapas*" access="hasAnyRole('ADMIN','SUPERVISOR','OPERADOR')" />
+		<sec:intercept-url pattern="/mapas/mapaEstacionesInfo*" access="hasAnyRole('ADMIN','SUPERVISOR','OPERADOR')" />
+		<sec:intercept-url pattern="/mapas/mapaAEstaciones631*" access="hasAnyRole('ADMIN','SUPERVISOR','OPERADOR')" />
+		<sec:intercept-url pattern="/mapas/mapaACuencasFecha*" access="hasAnyRole('ADMIN','SUPERVISOR','OPERADOR')" />
+		<sec:intercept-url pattern="/mapas/mapaEstacionesFI.xhtml" access="hasAnyRole('ADMIN','SUPERVISOR','OPERADOR')" />
+		<sec:intercept-url pattern="/mantenimiento.xhtml" access="hasAnyRole('ADMIN','SUPERVISOR','OPERADOR')" />
+
+		<sec:intercept-url pattern="/mapas/mapaSeveridadLocal*" access="hasAnyRole('ADMIN','SUPERVISOR')" />
+		<sec:intercept-url pattern="/mapas/mapaEstaciones24pmp*" access="hasAnyRole('ADMIN','SUPERVISOR','OPERADOR')" />
+		<sec:intercept-url pattern="/mapas/idt*" access="hasAnyRole('ADMIN','SUPERVISOR')" />
+		<sec:intercept-url pattern="/mapas/pmpd.xhtml" access="permitAll" />		
+		<sec:intercept-url pattern="/mapas/mapaRadares.xhtml" access="hasAnyRole('ADMIN','SUPERVISOR','OPERADOR')" />
+		<sec:intercept-url pattern="/mapas/mapaRadaresAcum.xhtml" access="hasAnyRole('ADMIN')" />
+
+		<sec:intercept-url pattern="/limnigramaMonitoreo.xhtml" access="hasAnyRole('ADMIN','SUPERVISOR')" />
+		<sec:intercept-url pattern="/usuarios.xhtml" access="hasAnyRole('ADMIN','SUPERVISOR')" />
+		<sec:intercept-url pattern="/notificaciones.xhtml" access="hasAnyRole('ADMIN','SUPERVISOR','OPERADOR')" />
+		<sec:intercept-url pattern="/ecuaciones.xhtml" access="hasAnyRole('ADMIN','SUPERVISOR')" />
+		<sec:intercept-url pattern="/cuencasGisDrenaje.xhtml" access="hasAnyRole('ADMIN','SUPERVISOR')" />
+		<sec:intercept-url pattern="/usuariosLogueados.xhtml" access="hasAnyRole('ADMIN')" />
+		<sec:intercept-url pattern="/sumarizadosMensuales.xhtml" access="hasAnyRole('ADMIN','SUPERVISOR')" />
+		
+		<sec:intercept-url pattern="/mapas/*" access="permitAll" />
+		<sec:intercept-url pattern="/expired.xhtml" access="permitAll" />
+
+
+		<!-- Page level Spring Security : Enable Primefaces -->
+		<sec:intercept-url pattern="/javax.faces.resource/**" access="permitAll" />
+		<sec:intercept-url pattern="/resources/style.css" access="permitAll" />
+		<sec:intercept-url pattern="/resources/ol.css" access="permitAll" />
+		<sec:intercept-url pattern="/images/*" access="permitAll" />
+		<sec:intercept-url pattern="/js/*" access="permitAll" />
+		<sec:intercept-url pattern="/sinarame/*" access="permitAll" />
+		<sec:intercept-url pattern="/docs/CRS-INA-SGA-IF-001-20-03.pdf" access="permitAll" />
+
+
+
+		<sec:intercept-url pattern="/**" access="isAuthenticated()" />
+
+		<!-- Define login page for Spring Security -->
+		<sec:form-login login-page="/login.xhtml" default-target-url="/index.xhtml" />
+
+		<!-- Define logout properties for Spring Security -->
+		<sec:logout invalidate-session="true" delete-cookies="true" logout-success-url="/login.xhtml"></sec:logout>
+
+		<sec:session-management session-fixation-protection="migrateSession" session-authentication-error-url="/login.xhtml?authFailed=true">
+			<sec:concurrency-control max-sessions="1" error-if-maximum-exceeded="true" expired-url="/expired.xhtml" session-registry-alias="sessionRegistry" />
+		</sec:session-management>
+		<!-- <sec:session-management session-authentication-strategy-ref="sas"/> -->
+
+ 		<sec:custom-filter after="BASIC_AUTH_FILTER" ref="headerFilter" />
+	</sec:http>
+	
+
+	<beans:bean id="headerFilter" class="ar.ina.alertas.filters.CustomFilter"/>
+
+	<!-- <beans:bean id="concurrencyFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter"> <beans:property name="sessionRegistry" ref="sessionRegistry" /> <beans:property name="expiredUrl" 
+		value="/expired.xhtml" /> </beans:bean> <beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" /> <beans:bean id="sas" class= "org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy"> 
+		<beans:constructor-arg name="sessionRegistry" ref="sessionRegistry" /> <beans:property name="maximumSessions" value="1" /> </beans:bean> -->
+
+	<!-- Set customUserDetailsService class as the authentication Manager for Spring Security -->
+	<sec:authentication-manager alias="authenticationManager">
+		<sec:authentication-provider user-service-ref="customUserDetailsService">
+			<sec:password-encoder ref="encoder"></sec:password-encoder>
+		</sec:authentication-provider>
+	</sec:authentication-manager>
+
+
+
+	<beans:bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+		<beans:constructor-arg name="strength" value="11" />
+	</beans:bean>
+
+	<!-- Inject authentication Manager to our LoginBean -->
+	<beans:bean id="loginBean" name="loginBean" class="ar.ina.alertas.view.LoginMBean" scope="prototype">
+		<beans:property name="authenticationManager" ref="authenticationManager"></beans:property>
+		<beans:property name="sessionRegistry" ref="sessionRegistry"></beans:property>
+	</beans:bean>
+
+
+
+</beans:beans>

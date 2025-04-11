@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:body>
+
+	<ui:composition template="template/template.xhtml">
+		<ui:define name="content">
+
+			<p:panelGrid columns="1" style="width: 100%; text-align:left">
+				<p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+					<f:facet name="start">
+						<h:graphicImage value="/images/ajaxloadingbar.gif" />
+						<h:outputText value="Actualizando..." />
+					</f:facet>
+
+					<f:facet name="complete">
+						<h:outputText value="" />
+					</f:facet>
+				</p:ajaxStatus>
+			</p:panelGrid>
+
+
+			<h:form id="form">
+
+				<p:messages id="messages" showDetail="true" />
+
+				<p:fieldset legend="#{messages.referencia}" style="padding:0.2em 1em">
+
+					<object type="application/pdf" data="docs/ReferenciaSGA.pdf?pfdrid_c=false" height="600px"
+						width="100%">
+						Su navegador no puede previsualizar pdf, <a href="docs/ReferenciaSGA.pdf">click</a> haga click si
+						desea descargarlo.
+					</object>
+				</p:fieldset>
+			</h:form>
+
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
+
