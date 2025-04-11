@@ -20,7 +20,7 @@
 		destroy-method="close">
 		<property name="driverClass" value="org.postgresql.Driver" />
 		<property name="jdbcUrl"
-			value="jdbc:postgresql://localhost:5433/alertas" />
+			value="jdbc:postgresql://sgainacirsa.ddns.net:5433/alertas" />
 		<property name="user" value="alertas_user" />
 		<property name="password" value="miraLaLuna1492" />
 		<property name="maxPoolSize" value="2" />
